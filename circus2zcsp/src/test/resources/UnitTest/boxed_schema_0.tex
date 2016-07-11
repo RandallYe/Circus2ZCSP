@@ -1,0 +1,50 @@
+\begin{zsection}
+  \SECTION\ boxed\_schema\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+	TT == 0 .. 9 \\
+\end{zed}
+
+\begin{axdef}
+    square: T \fun TT 
+\where
+    \forall n:T @ square(n) = n*n
+\end{axdef}
+
+\begin{axdef}
+    va: T 
+\end{axdef}
+
+\begin{circus}
+	\circchannel\ read, write: T \\
+	\circchannel\ in, out: T \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+\end{circus}
+\begin{circusaction}
+        \t1 \circstate\ State == [~ v: \nat | true ~] \\
+\end{circusaction}
+\begin{circusaction}
+        \t1 ISch ~~==~~ [~ (State)' | v' = 0 ~] \\
+        \t1 Init ~~==~~ ISch \\
+\end{circusaction}
+        \begin{schema}{CellWrite}
+            \Delta State; x?: \nat 
+            \where
+            v' = x? 
+        \end{schema}
+        %\t1 CellWrite ~~==~~ [~ \Delta State; x?: \nat | v' = x? ~] \\
+\begin{circusaction}
+        \t1 Read \circdef read!v \then \Skip \\
+        \t1 Write \circdef write?x \then \lschexpract CellWrite \rschexpract \\
+\end{circusaction}
+\begin{circusaction}
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+\end{circusaction}
+\begin{circus}
+	\circend
+\end{circus}

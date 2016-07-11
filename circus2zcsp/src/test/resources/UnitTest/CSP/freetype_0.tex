@@ -1,0 +1,36 @@
+\begin{zsection}
+  \SECTION\ freetype\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+	TT == 0 .. 9 \\
+    [NAME, PERSON] \\
+\end{zed}
+
+\begin{zed}
+    FT1 ::= a1 | a2 | a3  \\
+    FT2 ::= c1 | c2 | c3 | d1 \ldata T \rdata | d2 \ldata FT1 \rdata | d3 \ldata 1..3 \rdata \\
+    Tree ::= Leaf \ldata T \rdata | Branch \ldata Tree \cross Tree \rdata \\
+\end{zed}
+
+\begin{circus}
+	\circchannel\ read, write: FT1 \\
+	\circchannel\ in, out: FT2 \\
+	\circchannel\ t: Tree\\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: \nat | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        % can not have constructor d1(1) syntactically valid in CZT
+        %\t1 Read \circdef read?v \then out!c3 \then out!d1(1) \then \Skip \\
+        \t1 Read \circdef read?v \then out!c3 \then \Skip \\
+        \t1 Write \circdef in?v \then write!a2 \then \Skip \\
+        \t1 Action1 \circdef \circvar x:FT2 \circspot in?x \then ((\lcircguard x = d1(1) \rcircguard \circguard out!x \then \Skip) \extchoice (\lcircguard x \neq d2(a1) \rcircguard \circguard out!x \then \Skip) \extchoice (\lcircguard x \neq d2~a2 \rcircguard \circguard out!x \then \Skip)) \\
+        \t1 Action2 \circdef \circvar x:Tree \circspot t?x \then ((\lcircguard x = Leaf(1) \rcircguard \circguard \Skip) \extchoice (\lcircguard x \neq Branch(Leaf~1, Branch(Leaf~2, Leaf~3)) \rcircguard \circguard \Skip)) \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write \extchoice Action1 \extchoice Action2) \circseq X) \\ 
+	\circend
+\end{circus}
+

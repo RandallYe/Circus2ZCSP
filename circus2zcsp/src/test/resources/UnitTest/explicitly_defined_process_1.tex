@@ -1,0 +1,26 @@
+% 
+\begin{zsection}
+  \SECTION\ explicitly\_defined\_process\_1 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ read, write: T \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 S1 ~~==~~ [~  x, y: T | x \geq 1 \land y > 1 ~] \\
+        \t1 S2 ~~==~~ [~  z: \nat | z > 3 \land z < 10 ~] \\
+        \t1 \circstate\ State == S1 \land S2 \\
+        \t1 Init ~~==~~ [~ (State)' | x' = 1 \land y' = 2 \land z' = 5 ~] \\
+        \t1 CellWrite ~~==~~ [~ \Delta State; x?: \nat | x' = x? ~] \\
+        \t1 Read \circdef read!x \then \Skip \\
+        \t1 Write \circdef write?x \then \lschexpract CellWrite \rschexpract \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+

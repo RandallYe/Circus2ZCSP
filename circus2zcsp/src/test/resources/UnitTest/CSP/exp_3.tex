@@ -1,0 +1,27 @@
+% relation 
+
+\begin{zsection}
+  \SECTION\ exp\_3 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+	TT == 4 .. 7 \\
+	T1 == T \rel TT \\
+    T2 == \id T \\
+\end{zed}
+
+\begin{circus}
+	\circchannel\ c1: T1 \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: T1 | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = \{0 \mapsto 4\} ~] \\
+        \t1 Read \circdef \circvar r1:T1;r2:T2 \circspot \lcircguard (\dom~r1 = T) \land (\ran~r1 = TT) \land (r1 \inv = r1) \land ((r1 \comp \{4 \mapsto 0, 5 \mapsto 1 \}) = \{0 \mapsto 0, 1 \mapsto 1\}) \land ((r1 \circ \{4 \mapsto 0, 5 \mapsto 1 \}) = \{4 \mapsto 4, 5 \mapsto 5\}) \land (r1 = (r1 \oplus \{0 \mapsto 5\})) \rcircguard \circguard c1?x  \then \Skip \\
+        \t1 Write \circdef \circvar r:T1 \circspot \lcircguard (\{0,1\} \dres r = r) \land (r \rres \{4, 5\} = r) \land (\{0,1\} \ndres r = r) \land (r \nrres \{4, 5\} = r) \land (iter~2~r = r~^{~1~}) \land (\forall x:r @ first~x = 0) \land (\forall x:r @ second~x = 1) \land (r \limg T \rimg = TT) \rcircguard \circguard \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+

@@ -1,0 +1,29 @@
+% sequence 
+
+\begin{zsection}
+  \SECTION\ exp\_5 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+	TT == 4 .. 7 \\
+    S == \langle 0, 1, 2, 3 \rangle \\
+\end{zed}
+
+\begin{circus}
+	\circchannel\ c1: T \\
+	\circchannel\ c2: \seq T \\
+	\circchannel\ c3: \iseq T \\
+	\circchannel\ c4: \seq_1 T \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: \seq T | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = \langle 0, 1 \rangle ~] \\
+        \t1 Read \circdef \circvar s: \seq T \circspot \lcircguard (\#~s = 3) \land (\langle\rangle \cat S = S) \land (rev~s = S) \land (head~S = 0) \land (tail~S = \langle 1, 2, 3 \rangle) \land (front~S = \langle 0,1,2\rangle) \land (last~S = 3) \land (squash~\{0 \mapsto 1, 3 \mapsto 2, 2 \mapsto 1\} = \langle 1,1,2 \rangle) \rcircguard \circguard c1?x  \then \Skip \\
+        \t1 Write \circdef \circvar x:T \circspot \lcircguard (T \extract S = S) \land (S \filter T = S) \land (\langle 0, 1 \rangle \prefix S) \land (\langle 2, 3 \rangle \suffix S) \land (\langle 1, 2 \rangle \infix S) \land (\dcat~\langle \langle 0, 1 \rangle, \langle 2,3 \rangle \rangle = S) \land (\disjoint~\langle T, TT \rangle) \land (\langle T, TT \rangle \partition T \cup TT) \rcircguard \circguard \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+

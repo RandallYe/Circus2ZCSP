@@ -1,0 +1,31 @@
+% 
+\begin{zsection}
+  \SECTION\ action\_rewrite\_6 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+    T == \{0, 1, 2\} \\
+	Tx == 0 .. 3 \\ 
+	Ty == 4 .. 6 \\ 
+	Tz == 7 .. 9 \\ 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ index: T \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 S1 ~~==~~ [~  x: Tx; y: Ty | x \geq 1 \land y \neq 5 ~] \\
+        \t1 \circstate\ State ~~==~~ [~ S1; z: Tz | z > 7 ~] \\
+        \t1 Init ~~==~~ [~ (State)' | x' = 1 \land y' = 4 \land z' = 8 ~] \\
+        \t1 Update ~~==~~ [~ \Delta State; x?:Tx; y?:Ty; z?: Tz | x' = x? \land y' = y? \land z' = z? ~] \\
+        %\t1 \circspot (\circif\ (x > 0) \circthen index.0 \then \Skip\ \circelse\ x = 0 \circthen index.1 \then \Skip\ \circfi) \\
+        \t1 \circspot (\circif\ (x > 0) \circthen \Skip\ \circelse\ x = 0 \circthen \Skip\ \circfi) \\
+        %\t1 \circspot \circif x = 0 \circthen index!0 \then \Skip \circelse \Skip \circfi \\
+                    %\circelse x = 1 \circthen index!1 \then \Skip
+                    %\circelse x > 1 \circthen index!2 \then \Skip
+                    % \circfi
+	\circend
+\end{circus}
+

@@ -1,0 +1,17 @@
+\begin{zsection}
+  \SECTION\ indexed\_process\_2 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{circus}
+	\circchannel\ c, d: \nat \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ IP \circdef i:\{1,2\} \circindex \circbegin \\
+        \t1 \circstate\ State == [~ v: \nat | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        \t1 Read \circdef c!v \then \Skip \\
+        \t1 Write \circdef d?x \then \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}

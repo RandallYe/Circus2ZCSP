@@ -1,0 +1,33 @@
+% predicate/logic 
+
+\begin{zsection}
+  \SECTION\ exp\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+	TT == 0 .. 9 \\
+	FT == T \fun TT \\
+    [NAME, PERSON] \\
+\end{zed}
+
+\begin{circus}
+	\circchannel\ read, write: T\\
+	\circchannel\ in, out: TT\\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: FT | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = \emptyset ~] \\
+        \t1 Read \circdef \circvar x:T \circspot \lcircguard (\exists b:\boolean @ b = \true \lor b = \false) \lor (\forall y:T @ x > y) \rcircguard \circguard read?x \then \Skip \\
+        \t1 Write \circdef \circvar x:T \circspot \lcircguard \lnot (\exists y,z:T @ x = y \land x = z) \lor (\exists_1 u:TT @ ((u = 1) \implies (x > 1)) \land ((u = x) \iff (x = u))) \rcircguard \circguard write!x \then \Skip \\
+        \t1 Action1 \circdef \circvar x:T \circspot \lcircguard  (x \neq 1 \land x = (\IF x = 1 \THEN 2 \ELSE 3)) \rcircguard \circguard write!0 \then \Skip \\
+        \t1 Action2 \circdef \circvar x:T \circspot write!((\lambda y:T | y > 2 @ y - 1)(1)) \then \Skip \\
+        \t1 Action3 \circdef \circvar x:T \circspot write!((\lambda y,z:T | y > 2 \land z > 1 @ y - z)(1, 2)) \then \Skip \\
+        \t1 Action4 \circdef \circvar x:T \circspot write!((\lambda y:T @ y - 1)(1)) \then \Skip \\
+        \t1 Action5 \circdef \circvar x:T \circspot write!((\mu y:T | y - 1 = 1 @ y) + (\mu z:\{1\} @ z+1)) \then \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write \extchoice Action1 \extchoice Action2 \extchoice Action3 \extchoice Action4 \extchoice Action5) \circseq X) \\ 
+	\circend
+\end{circus}
+

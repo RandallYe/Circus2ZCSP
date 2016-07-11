@@ -1,0 +1,29 @@
+% test renaming process
+%   P[c:=d]
+\begin{zsection}
+  \SECTION\ indexed\_renaming\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ c, d: T \\
+	\circchannel\ cc, dd: T \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: \nat | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        \t1 Read \circdef c!v \then \Skip \\
+        \t1 Write \circdef d?x \then \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+
+\begin{circus}
+    \circprocess\ RP \circdef P \lcircrename c, d := cc, dd \rcircrename \\
+\end{circus}
+

@@ -1,0 +1,2192 @@
+\documentclass{report} %
+
+\usepackage{vmargin}
+\setpapersize{A4}
+%\setmarginsrb{leftmargin}{topmargin}{rightmargin}{bottommargin}{headheight}{headsep}{footheight}{footskip}
+%\setmarginsrb{20mm}{10mm}{20mm}{10mm}{12pt}{11mm}{0pt}{11mm}
+%\setmarginsrb{25mm}{20mm}{25mm}{20mm}{12pt}{11mm}{0pt}{10mm}
+%\setmarginsrb{40mm}{20mm}{40mm}{20mm}{12pt}{11mm}{0pt}{10mm}
+\setmarginsrb{25mm}{20mm}{25mm}{20mm}{12pt}{11mm}{0pt}{10mm}
+
+\usepackage[color]{circus}
+%\usepackage[cntbysection,color]{circus}
+
+\usepackage{savesym}
+\savesymbol{Let}
+\savesymbol{tick}
+\savesymbol{Within}
+\usepackage{cspsymb}
+\restoresymbol{TXF}{Within}
+\restoresymbol{TXF}{Let}
+\restoresymbol{TXF}{tick}
+
+%\usepackage{fuzz}
+\def\fuzz{{\large\it f\kern0.1em}{\normalsize\sc uzz}}
+%
+%overwrite \boolean from ifthen.sty
+\renewcommand{\boolean}{{\mathbb B}} 
+
+\newcommand{\HandelC}{\textsf{\slshape Handel-C}}
+
+\newcommand{\action}[1]{\mathsl{#1}}
+
+\newcommand{\cbegin}{\mathbf{begin}}
+\newcommand{\ccon}{\mathbf{con}}
+\newcommand{\cend}{\mathbf{end}}
+\newcommand{\chanevents}[1]{\{\!\mid #1 \mid\!\}}
+\newcommand{\channelname}[1]{\mathsl{#1}}
+\newcommand{\chan}{\mathbf{channel}}
+\newcommand{\compresslist}{\itemsep=0pt \parskip=0pt}
+\newcommand{\cprocess}{\mathbf{process}}
+\newcommand{\cvar}{\mathbf{var}}
+\newcommand{\eventname}[1]{\mathsl{#1}}
+\newcommand{\processname}[1]{\mathsl{#1}}
+
+\newcommand{\event}[1]{\mathsl{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% New Command for text
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% shortcut for typewriter
+\newcommand{\T}[1]{\texttt{#1}}
+% shortcut for bold text
+\newcommand{\B}[1]{\textbf{#1}}
+\newcommand{\I}[1]{\textit{#1}}
+\newcommand{\BI}[1]{\textit{\textbf{#1}}}
+\newcommand{\TN}[1]{\textnormal{#1}}
+\newcommand{\TTR}[1]{\textrm{#1}}
+\newcommand{\mi}{\;|\;}
+\newcommand{\ee}{&\quad::=\quad&}
+
+\newcommand{\mrm}[1]{\mathrm{#1}} %Roman Font
+\newcommand{\mbf}[1]{\mathbf{#1}} %Boldface Font
+\newcommand{\msf}[1]{\mathsf{#1}} %Sans Serif Font
+\newcommand{\mtt}[1]{\mathtt{#1}} %Typewriter Font
+\newcommand{\miit}[1]{\mathit{#1}} %Italic Font
+\newcommand{\mcl}[1]{\mathcal{#1}} %Calligraphic Front
+\newcommand{\mnm}[1]{\mathnormal{#1}} %Normal Font
+
+\begin{document}
+\bibliographystyle{plain}
+
+\title{The \Circus\ solution for the Steam Boiler Problem \\ (Corrected based on Jim Woodcock's original report)}
+\author{Kangfeng Ye}
+\date{\today}
+
+\maketitle
+
+\begin{abstract}
+   \noindent This is a \Circus\ solution for the steam boiler control system problem. The specification is based on the original report back to 2002 by Jim Woodcock. Then we use the model checker to find errors and correct them afterwards. Therefore, it is the parsed, type-checked and model-checked version of \Circus\ solutions for the steam boiler problem. But by now, it is not completely model-checked, such as deadlock free, livelock free, and other properties due to the state space explosion problem.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage %
+
+\tableofcontents %
+
+\newpage %
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+
+This case study is based on the \Circus\ solution for the steam boiler control system problem~\cite{Abrial1995} from Jim Woodcock's original technical report~\cite{Woodcock2001a}. Additionally, I also read Leo Freitas's parsable steam boiler~\cite{Freitas2006} which is based on Jim Woodcock's original version as well. The purpose of this work is to formalise the solution by the model checking approach~\cite{Ye2015} we have proposed recently. It is worth noting that this document omits most of description of this model in the original version for brevity. Therefore, it can be better understood with references to the original document. 
+
+The steps to apply our approach to this case are listed below. 
+\begin{itemize}
+    \item Step 1. Use $Circus2ZCSP$ translator to link this specification to the combination of CSP and Z---consequently two files named \emph{steam\_boiler\_z.tex} and \emph{steam\_boiler\_csp.csp} respectively.
+    \item Step 2. Load the two files into modified ProB. 
+    \item Step 3. Then use ProB's model checking and animation functions to find errors. For errors, we modify this model to correct the problems, and then go back to ``Step 1'' again.
+\end{itemize}
+
+\section{Notes}
+\begin{itemize}
+    \item We rename all identifies with subscript digits to underline ($\_$) symbol. For example, $M_1$ to $M\_1$. That is due to the fact that subscript is not supported in CSP.
+    \item According to Leo's version, for the appropriate typesetting of the expected text in Unicode, the freetype should be given a \LaTeX\ markup directives and a \LaTeX\ command. For brevity, this model omits this additional \LaTeX\ definitions. 
+\end{itemize}
+%
+%\chapter{Introduction}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%This report has been prepared for the Defence Evaluation and Research
+%Agency, Malvern, UK, under grant number CU009-0000004344.
+%
+%The research was carried out by the author at the University of
+%Oxford, and whilst on visits to the following institutions: the
+%Federal University of Pernambuco, Trinity College Dublin, the Stevens
+%Institute of Technology in New Jersey, and the United Nations
+%University, International Institute for Software Technology in Macau
+%(UNU/IIST).
+%
+%The author has discussed the steam boiler over a long period of time
+%with many people, including: Jean-Raymond Abrial, Dines Bj{\o}rner,
+%Eerke Boiten, Christie Bolton, Egon B\"{o}rger, Andrew Butterfield,
+%Ana Cavalcanti, Charlie Crichton, Jim Davies, John Derrick, Lindsay
+%Groves, Daniel Jackson, He Jifeng, Tony Hoare, Steve King, Andrew
+%Martin, Alistair \hbox{McEwan}, Colin O'Halloran, Augusto Sampaio,
+%Anthony Smith, Ib Holm S{\o}rensen, and the Visiting Fellows at
+%UNU/IIST.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%\section{\Circus}
+%
+%The research in this report has influenced the design of \Circus, a
+%concurrent refinement calculus \cite{woodcock-cavalcanti-01} that
+%unifies the Z notation \cite{spivey-88, potter-sinclair-till-91,
+%  spivey-92, woodcock-davies-96}, CSP \cite{hoare-85, roscoe-98}, and
+%ZRC \cite{cavalcanti-97, cavalcanti-woodcock-98}, a refinement
+%calculus for Z.  The semantics of \Circus\ is based on Hoare \& He's
+%\emph{Unifying Theories of Programming} \cite{hoare-he-98}, in which
+%the theory of alphabetised relations is used as a common semantic
+%basis for many diverse paradigms of programming, including imperative
+%programming, concurrency, and communication, which are fundamental to
+%\Circus.
+%
+%An objective of the design of \Circus\ is to provide a sound
+%development technique based on the refinement calculus \cite
+%{morgan-94} for parallel programming languages including
+%\textsf{occam} \cite{inmos-84}, \HandelC\
+%\cite{embedded-solutions-ltd-99}, and even Java
+%\cite{arnold-gosling-96, cavalcanti-sampaio-01}.  The effective use of
+%such a calculus requires tool support, and we use two tools together
+%in analysing \Circus\ specifications: Z/EVES
+%\cite{meisels-saaltink-97, saaltink-97} and FDR
+%\cite{formal-systems-97}.  The Z specifications in this document have
+%been parsed and type-checked using \fuzz\ \cite{spivey-95} and the FDR
+%scripts checked using FDR 2.78; a verification using Z/EVES was
+%incomplete at the date of writing.
+%
+%In \cite{woodcock-cavalcanti-01}, Z is used as the concrete syntax for
+%the theory of alphabetised relations, so a \Circus\ specification
+%actually denotes a Z specification, in spite of containing terms in
+%the syntax of CSP.  This means that Z tools may be used to analyse
+%entire \Circus\ specifications, not just those parts written in Z.
+%This is particularly useful when it is not possible or convenient to
+%reduce a \Circus\ specification to the size where it may be
+%model-checked using FDR, and we need to verify a development with a
+%theorem prover.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%\section{The steam boiler problem}
+%
+%The \emph{steam-boiler} problem has established itself as one of the
+%standard problems in software engineering, alongside the library, the
+%lift, and the telephone exchange.  It was first posed by Bauer from
+%the University of Waterloo \cite{bauer-93}, and subsequently
+%popularised by Abrial as the subject of a Dagstuhl workshop
+%\cite{abrial-96-b}.  The problem description and twenty-two solutions
+%are contained in \cite{abrial-borger-langmaack-96}; Abrial's own
+%solution is published separately in \cite{abrial-96-a}.
+%
+%The problem is to program the control system for a steam boiler, such
+%as might be found in a power station.  The control software is
+%supposed to exist within a physical environment with the following
+%elements.
+%{\slshape
+%  \begin{itemize}\compresslist
+%  \item The steam boiler.
+%  \item A sensor to detect the level of the water in the boiler.
+%  \item Four pumps supplying the steam boiler with water.
+%  \item Four pump controllers.
+%  \item A sensor to measure the quantity of steam being produced.
+%  \item An operator's desk.
+%  \item A message transmission system.
+%  \end{itemize}
+%}
+%The steam-boiler's components have various parameters that constrain
+%their working capacities; these are described in
+%table~\ref{table:parameters}.
+%\begin{table}[htbp]
+%  \bigskip %
+%  \begin{center}\slshape
+%    \begin{tabular}{c|l}
+%      \textbf{\slshape parameter} & \textbf{\slshape meaning}
+%      \\[1mm] %
+%      \hline %
+%      \\[-3mm] %
+%      \( C \) & the capacity of the boiler
+%      \\ %
+%      \( M_1 \) & the minimum water level; if the level remains below
+%      \( M_1 \)\/ while
+%      \\ %
+%      & the steam production is at its maximum, then the steam boiler
+%      \\ %
+%      & would be in danger after five seconds
+%      \\ %
+%      \( M_2 \) & the maximum water level; if the level remains above \(
+%      M_2 \)\/ without
+%      \\ %
+%      & steam production, then the steam boiler would be in danger
+%      \\ %
+%      & after five seconds
+%      \\ %
+%      \( N_1 \) & the minimum normal quantity of water, where \( M_1 <
+%      N_1 \)
+%      \\ %
+%      \( N_2 \) & the maximum normal quantity of water, where \( N_2 <
+%      M_2 \)
+%      \\ %
+%      \( W \) & the maximum quantity of steam at the steam-boiler exit
+%      \\ %
+%      \( U_1 \) & the maximum gradient of increase of the quantity of
+%      steam
+%      \\ %
+%      \( U_2 \) & the maximum gradient of decrease of the quantity of
+%      steam
+%      \\ %
+%      \( q \) & the measure of the water level
+%      \\ %
+%      \( P \) & the capacity of a pump
+%      \\ %
+%      \( v \) & the measure of the steam rate
+%    \end{tabular}
+%  \end{center}
+%  \caption{Parameters and their meanings}\label{table:parameters}
+%\end{table}
+%
+%After a pump has been switched on, it takes five seconds before water
+%is pumped into the boiler, because of the need to balance pressures;
+%however, it can be stopped instantaneously.  A pump controller reports
+%on whether there is water passing through its pump.
+%
+%The program communicates with the physical units through messages that
+%are transmitted over dedicated lines.  Transmission times may be
+%neglected and all messages may be regarded as arriving simultaneously.
+%The control program operates in five different modes.
+%\begin{itemize}\compresslist
+%\item \emph{Initialisation}.  The program checks the water and steam
+%  sensors for correct operation; it ensures that the water level is
+%  between normal operating limits.
+%\item \emph{Normal}.  This is the standard operating mode, where the
+%  program tries to maintain the water level; there are no unrepaired
+%  failures.
+%\item \emph{Degraded}.  The water sensor has not failed, but some
+%  other non-vital piece of equipment has; the program continues to
+%  operate.
+%\item \emph{Rescue}.  The water sensor has failed; the program
+%  continues to operate.
+%\item \emph{Emergency stop}.  The program enters this mode if it has
+%  been instructed to stop, if the water level is near to one of the
+%  overall limits, if a vital piece of equipment has failed, or if
+%  there is some irregularity in the protocol between the program and
+%  the physical equipment.
+%\end{itemize}
+%The program does not terminate and follows a cycle that takes place
+%every five seconds: \emph{receive messages---analyse
+%  information---transmit messages}.
+%
+%\section{The \Circus\ solution}
+%
+%Our solution to the problem consists of four processes operating in
+%parallel.
+%\begin{enumerate}\compresslist
+%\item The \textbf{\( \mathsl{Timer} \)}\/ makes sure that the
+%  program's cycle begins every five seconds.
+%\item The \textbf{\( \mathsl{Analyser} \)}\/ inputs messages from the
+%  physical units and analyses their content.  Once the analysis is
+%  complete, it offers an \emph{information service} to the \(
+%  \mathsl{Controller} \).
+%\item The \textbf{\( \mathsl{Controller} \)}\/ decides on the actions
+%  to be taken, based on the information that it receives.  It
+%  generates outputs for the \( \mathsl{Reporter} \).
+%\item The \textbf{\( \mathsl{Reporter} \)}\/ offers a \emph{reporting
+%    service} to the \( \mathsl{Controller} \)\/ by gathering its
+%  outputs and packaging them together for dispatch to the physical
+%  units.  It signals the completion of the cycle.
+%\end{enumerate}
+%
+%Our solution is guided by a desire to find efficient ways of verifying
+%our model; in particular, we want to use the FDR model checker.  There
+%are two obstacles to using a model checker for a system such as this:
+%the state explosion problem and the presence of loose constants.  FDR
+%can check an impressive number of states, but the rich state of the
+%steam boiler exceeds this capacity by many orders of magnitude.
+%
+%Loose constants complicate model checking, since they must be given
+%specific values; an argument is then required to extrapolate from
+%these specific values to arbitrary ones.  The full steam-boiler
+%system, described at the level of the requirements, depends on several
+%loosely-specified constants; any reasonable instantiation of these
+%constants leads to a massive number of states.
+%
+%Our solution is to separate the \( \mathsl{Controller} \) and its
+%finite state machine from the \( \mathsl{Analyser}\) and the rich
+%state that it constructs from the history of input messages.  The \(
+%\mathsl{Analyser} \)\/ digests the incoming messages and makes this
+%digest available to the \( \mathsl{Controller} \)\/ as abstract
+%events; this makes the \( \mathsl{Controller} \)\/ amenable to fully
+%automatic model checking using FDR, having fewer than one million
+%states and no loose constants to instantiate.
+%
+%Extrapolation from the abstract behaviour of the \(
+%\mathsl{Controller} \) to the concrete realities of the requirements
+%is provided by the \( \mathsl{Analyser} \).  In fact, it may be viewed
+%as a retrieve function from the concrete details of the state to an
+%abstract interpretation of those details, in the sense of data
+%refinement~\cite{jones-90, woodcock-davies-96}.
+%
+%The sequence of messages involved in the interaction between these
+%five processes is described in the message sequence chart in
+%figure~\ref{fig:msg-seq-chart}.  In this diagram, the \(
+%\mathsl{ainput} \)\/ and \( \mathsl{aoutput} \)\/ channels connect to
+%the environment; everything else is internal.  The \( \mathsl{ainfo}
+%\)\/ and \( \mathsl{a}\-\mathsl{report} \)\/ represent collections of
+%communications between their respective processes.  To understand the
+%sequence of messages in a little more detail, we present an
+%abstraction of the \Circus\ specification as a pure CSP process.
+%\begin{figure}[htbp]
+%  \begin{center}
+%    \begin{picture}(250,320)(0,0)
+%      % five vertical coloured lines
+%      \put(50,280){\color{blue}\circle*{5}}
+%      \put(50,0){\color{blue}\line(0,1){280}}
+%      \put(50,0){\color{blue}\circle*{5}}
+%      \put(100,280){\color{red}\circle*{5}}
+%      \put(100,0){\color{red}\line(0,1){280}}
+%      \put(100,0){\color{red}\circle*{5}}
+%      \put(150,280){\color{blue}\circle*{5}}
+%      \put(150,0){\color{blue}\line(0,1){280}}
+%      \put(150,0){\color{blue}\circle*{5}}
+%      \put(200,280){\color{red}\circle*{5}}
+%      \put(200,0){\color{red}\line(0,1){280}}
+%      \put(200,0){\color{red}\circle*{5}}
+%      % add some coloured titles
+%      \put(50,295){\color{blue}\makebox(0,0)[t]{\( \mathsl{Timer} \)}}
+%      \put(100,295){\color{red}\makebox(0,.5)[t]{\( \mathsl{Analyser} \)}}
+%      \put(150,295){\color{blue}\makebox(0,.5)[t]{\( \mathsl{Controller} \)}}
+%      \put(200,295){\color{red}\makebox(0,0)[t]{\( \mathsl{Reporter} \)}}
+%      % add messages
+%      % --------------------------------------------------------------
+%      % Timer  -- startcycle -->  Sequencer
+%      \put(75,260){\makebox(0,0)[t]{\footnotesize\color{blue}\(
+%          \mathsl{startcycle} \)}}
+%      \put(50,250){\color{blue}\vector(1,0){50}}
+%      % -- ainput --> Analyser
+%      \put(50,240){\makebox(0,0)[t]{\footnotesize\( \mathsl{ainput} \)}}
+%      \put(10,230){\circle*{5}}
+%      \put(12,230){\vector(1,0){87.5}}
+%      \put(27.5,220){\makebox(0,0)[t]{\footnotesize\( \mathsl{clocktick} \)}}
+%      \put(12,210){\vector(1,0){37.5}}
+%      \put(10,210){\circle*{5}}
+%      \put(27.5,200){\makebox(0,0)[t]{\footnotesize\( \mathsl{clocktick} \)}}
+%      \put(12,190){\vector(1,0){37.5}}
+%      \put(10,190){\circle*{5}}
+%      \put(27.5,180){\makebox(0,0)[t]{\footnotesize\( \mathsl{clocktick} \)}}
+%      \put(12,170){\vector(1,0){37.5}}
+%      \put(10,170){\circle*{5}}
+%      \put(27.5,160){\makebox(0,0)[t]{\footnotesize\( \mathsl{clocktick} \)}}
+%      \put(12,150){\vector(1,0){37.5}}
+%      \put(10,150){\circle*{5}}
+%      \put(27.5,140){\makebox(0,0)[t]{\footnotesize\( \mathsl{clocktick} \)}}
+%      \put(12,130){\vector(1,0){37.5}}
+%      \put(10,130){\circle*{5}}
+%      % --------------------------------------------------------------
+%      % Analyser -- startexec --> Controller
+%      \put(125,220){\makebox(0,0)[t]{\footnotesize\color{red}\(
+%          \mathsl{startexec} \)}}
+%      \put(100,210){\color{red}\vector(1,0){50}}
+%      % Controller  -- startreport -->  Reporter
+%      \put(175,200){\makebox(0,0)[t]{\footnotesize\color{blue}\(
+%          \mathsl{startreport} \)}}
+%      \put(150,190){\color{blue}\vector(1,0){50}}
+%      % Analyser == ainfo ==> Controller
+%      \put(125,160){\makebox(0,0)[t]{\footnotesize\color{red}\(
+%          \mathsl{ainfo} \)}}
+%      \put(100,150){\color{red}\vector(1,0){50}}
+%      % Controller  -- areport -->  Reporter
+%      \put(175,140){\makebox(0,0)[t]{\footnotesize\color{blue}\(
+%          \mathsl{areport} \)}}
+%      \put(150,130){\color{blue}\vector(1,0){50}}
+%      % --------------------------------------------------------------
+%      % Controller  -- reportmode -->  Reporter
+%      \put(175,120){\makebox(0,0)[t]{\footnotesize\color{blue}\(
+%          \mathsl{reportmode} \)}}
+%      \put(150,110){\color{blue}\vector(1,0){50}}
+%      % Controller  -- endreport -->  Reporter
+%      \put(175,100){\makebox(0,0)[t]{\footnotesize\color{blue}\(
+%          \mathsl{endreport} \)}}
+%      \put(150,90){\color{blue}\vector(1,0){50}}
+%      % --------------------------------------------------------------
+%      % Analyser -- afailuresrepairs --> Reporter
+%      \put(150,80){\makebox(0,0)[t]{\footnotesize\color{red}\(
+%          \mathsl{afailuresrepairs} \)}}
+%      \put(100,70){\color{red}\vector(1,0){100}}
+%      % Reporter  -- aoutput -->
+%      \put(219.75,50){\makebox(0,0)[t]{\footnotesize\( \mathsl{aoutput} \)}}
+%      \put(239.95,40){\circle*{5}}
+%      \put(200,40){\vector(1,0){38.5}}
+%      % Analyser <-- apumps -- Controller
+%      \put(150,30){\makebox(0,0)[t]{\footnotesize\color{red}\(
+%          \mathsl{apumps} \)}}
+%      \put(200,20){\color{red}\vector(-1,0){100}}
+%      % --------------------------------------------------------------
+%    \end{picture}
+%    \caption{Message sequence chart}
+%    \label{fig:msg-seq-chart}
+%  \end{center}
+%\end{figure}
+%
+%Both the \( \mathsl{Controller} \)\/ and the \( \mathsl{Reporter} \)\/
+%keep track of the current mode, which is selected from the following
+%data-type.
+%\[
+%  \mathbf{datatype}\ Mode = \mathsf{initialisation} \mid %
+%  \mathsf{normal} \mid \mathsf{degraded} \mid \mathsf{rescue} \mid
+%  \mathsf{emergencyStop}
+%  \also %
+%  NonEmergencyModes = \{ \mathsf{initialisation}, \mathsf{normal},
+%  \mathsf{degraded}, \mathsf{rescue} \}
+%\]
+%The mode is stored in a simple variable process, which starts off in
+%\( \mathsf{initialisation} \)\/ mode.
+%\[
+%\mathbf{channel}\ \mathsl{getmode}, \mathsl{putmode}: Mode
+%  \also %
+%  ModeStateInterface = \chanevents{\mathsl{getmode}, \mathsl{putmode}}
+%  \also %
+%  \mathsl{ModeState} =
+%  \\ %
+%  \t1
+%  \begin{zedblock}
+%    \mathbf{let}
+%    \\ %
+%    \t1
+%    \begin{zedblock}
+%      \mathsl{MS}(m) =
+%      \begin{zedblock}
+%        \mathsl{putmode}\,?n \then MS(n)
+%        \\ %
+%        \extchoice
+%        \\ %
+%        \mathsl{getmode}\,!m \then \mathsl{MS}(m)
+%      \end{zedblock}
+%    \end{zedblock}
+%    \\ %
+%    \mathbf{within}
+%    \\ %
+%    \t1 \mathsl{MS}(\mathsf{initialisation})
+%  \end{zedblock}
+%  \also %
+%  \mathsl{EnterMode}(m) = \mathsl{reportmode}\,!m \then
+%  \mathsl{putmode}\,!m \then \mathsl{SKIP}
+%\]
+%
+%We must define all the channels from the message sequence chart in
+%figure~\ref{fig:msg-seq-chart}.  In our abstract view, channels that
+%carry communications have been reduced to mere synchronisations, with
+%the exception of the \( \mathsl{aoutput} \)\/ and \(
+%\mathsl{reportmode} \)\/ channels, which merely communicate the
+%current mode.
+%\[
+%  \mathbf{channel}\ %
+%  \begin{zedblock}
+%    \mathsl{ainfo}, \mathsl{areport}, \mathsl{clocktick},
+%    \mathsl{endcycle}, \mathsl{endreport}, \mathsl{afailuresrepairs},
+%    \mathsl{ainput},
+%    \\ %
+%    \mathsl{apumps}, \mathsl{startcycle}, \mathsl{startexec},
+%    \mathsl{startreport}
+%  \end{zedblock}
+%  \also %
+%  \mathbf{channel}\  \mathsl{aoutput}, \mathsl{reportmode} : Mode
+%\]
+%We describe the internal interfaces between the processes being
+%composed from left to right:~\( TAnalyserInterface \)\/ is the
+%interface between the \( \mathsl{Timer} \)\/ and the \(
+%\mathsl{Analyser1} \); \( TA\-Controller\-Interface1 \)\/ is the
+%interface between the \( \mathsl{Timer1} \)-\( \mathsl{Analyser1}\)\/
+%subsystem and the \( \mathsl{Controller1} \); and \(
+%TACReporterInterface1 \)\/ is the interface between the \(
+%\mathsl{Timer} \)-\( \mathsl{Analyser1}\)-\(\mathsl{Controller1} \)\/
+%subsystem and the \( \mathsl{Reporter1} \).  The `-1' suffix denotes a
+%component that is refined later in the report.
+%\[
+%  TAnalyserInterface = \{ \mathsl{startcycle} \}
+%  \also %
+%  TAControllerInterface1 = \{ \mathsl{ainfo}, \mathsl{startexec} \}
+%  \also %
+%  TACReporterInterface1 =
+%  \also %
+%  \t1 \chanevents{
+%    \begin{zedblock}
+%      \mathsl{apumps}, \mathsl{areport}, \mathsl{endreport},
+%      \mathsl{afailuresrepairs}, \mathsl{reportmode},
+%      \mathsl{startreport}}
+%  \end{zedblock}
+%\]
+%The \( \mathsl{Timer} \)\/ signals the start of the cycle and repeats
+%this after every fifth clock tick.
+%\[
+%  cycletime = 5 %
+%  \also %
+%  cyclelimit = cycletime - 1
+%  \also %
+%  \mathsl{TCycle}(time) =
+%  \\ %
+%  \t1
+%  \begin{zedblock}
+%    ( \If ( time + 1 ) \mod cycletime = 0 \Then startcycle \then
+%    \mathsl{SKIP} \Else \mathsl{SKIP});
+%    \\ %
+%    \mathsl{clocktick} \then \mathsl{TCycle}(( time + 1 ) \mod
+%    cycletime)
+%  \end{zedblock}
+%  \also %
+%  \mathsl{Timer} = \mathsl{TCycle}(cyclelimit)
+%\]
+%The \( \mathsl{Analyser} \)\/ cycles through its sequence of events,
+%offering as many \( \mathsl{ainfo} \)\/ events as required.  The
+%information service is terminated by the transmission of data about
+%outstanding failures and repair acknowledgements.  This is followed by
+%the receipt of information about the instructions sent to pumps, which
+%is needed by the \( \mathsl{Analyser} \) in order to maintain its
+%model of their state.
+%\[
+%  \mathsl{Analyser1} = \mathsl{startcycle} \then \mathsl{ainput} \then %
+%  \mathsl{startexec} \then \mathsl{InfoService1}
+%  \also %
+%  \mathsl{InfoService1} =
+%  \\ %
+%  \t1
+%  \begin{zedblock}
+%    \mathsl{ainfo} \then \mathsl{InfoService1}
+%    \\ %
+%    \extchoice
+%    \\ %
+%    \mathsl{afailuresrepairs} \then \mathsl{apumps}
+%    \then \mathsl{Analyser1}
+%  \end{zedblock}
+%\]
+%We add the \( \mathsl{Analyser} \)\/ to the \( \mathsl{Timer} \),
+%synchronising on its hidden interface.
+%\[
+%  \mathsl{TAnalyser1} = %
+%  \\ %
+%  \t1 ( \mathsl{Timer} \parallel [ TAnalyserInterface ]
+%  \mathsl{Analyser1} ) \hide TAnalyserInterface
+%\]
+%The assembly is free from deadlock and livelock.
+%\[
+%  \mathbf{assert}\ \mathsl{TAnalyser1} :[ \hbox{ deadlock free } [FD] ]
+%  \also %
+%  \mathbf{assert}\ \mathsl{TAnalyser1} :[ \hbox{ livelock free } [FD] ]
+%\]
+%The \( \mathsl{Controller} \)\textsl{'s}\/ behaviour is initiated by a
+%\( \mathsl{startexec} \)\/ event, which it passes on to the \(
+%\mathsl{Reporter} \)\/ as a \( \mathsl{startreport} \)\/ event.  The
+%\( \mathsl{Controller} \)\textsl{'s}\/ task is to generate
+%instructions to control the steam boiler, based on the information
+%made available to it by the \( \mathsl{Analyser} \).
+%
+%One possibility is that the \( \mathsl{Analyser} \)\/ instructs the \(
+%\mathsl{Controller} \)\/ to perform an \( \mathsf{emergencyStop} \).
+%If this does not happen, then the \( \mathsl{Controller} \)\/ receives
+%a number of \( \mathsl{ainfo} \)\/ signals from the \(
+%\mathsl{Analyser} \)\/ and takes action on them, depending on the
+%current mode.
+%\[
+%  \mathsl{Controller1} =
+%  \\ %
+%  \t1
+%  \begin{zedblock}
+%    \mathsl{startexec} \then
+%    \\ %
+%    \t1
+%    \begin{zedblock}
+%      \mathsl{startreport} \then
+%      \\ %
+%      \t1
+%      \begin{zedblock}
+%        \mathsl{NewModeAnalysis1};
+%        \\ %
+%        \begin{zedblock}
+%          \mathsl{getmode}\,?m \then
+%          \\ %
+%          \t1
+%          \begin{zedblock}
+%            (\
+%            \begin{zedblock}
+%              \If m \neq \mathsf{emergencyStop} \Then
+%              \\ %
+%              \t1 \Intchoice i: \{ 0 \upto limit \} \spot
+%              \mathsl{PutReports}(i)
+%              \\ %
+%              \Else \mathsl{SKIP}\ );
+%            \end{zedblock}
+%            \\ %
+%            \mathsl{endreport} \then \mathsl{Controller1}
+%          \end{zedblock}
+%        \end{zedblock}
+%      \end{zedblock}
+%    \end{zedblock}
+%  \end{zedblock}
+%\]
+%The process \( \mathsl{NewModeAnalysis1} \)\/ decides on the next mode
+%to enter, given the current mode and the information made available to
+%it.  Once \( \mathsl{NewModeAnalysis1} \)\/ has completed its work,
+%the \( \mathsl{Controller} \)\/ generates some \( \mathsl{areports}
+%\), and passes information back to the \( \mathsl{Analyser} \)\/ on
+%the required state of the steam-boiler's pumps.
+%\[
+%  \mathsl{NewModeAnalysis1} =
+%  \\ %
+%  \t1
+%  \begin{zedblock}
+%    \mathsl{ainfo} \then \mathsl{EnterMode}(emergencyStop)
+%    \\ %
+%    \intchoice
+%    \\ %
+%    (\
+%    \begin{zedblock}
+%      ( \Intchoice i: \{ 0 \upto limit \} @
+%      \mathsl{GetInfomation}(i) );
+%      \\ %
+%      \mathsl{getmode}\,?mode \then
+%      \\ %
+%      \t1
+%      \begin{zedblock}
+%        \If mode = \mathsf{initialisation} \Then
+%        \mathsl{InitModeAnalysis1}
+%        \\ %
+%        \Else \If mode = \mathsf{normal} \Then
+%        \mathsl{NormalModeAnalysis1}
+%        \\ %
+%        \Else \If mode = \mathsf{degraded} \Then
+%        \mathsl{DegradedModeAnalysis1}
+%        \\ %
+%        \Else \If mode = \mathsf{rescue} \Then
+%        \mathsl{RescueModeAnalysis1}
+%        \\ %
+%        \Else \mathsl{SKIP}
+%      \end{zedblock}
+%      \\ %
+%      )
+%    \end{zedblock}
+%  \end{zedblock}
+%\]
+%In each nonemergency mode, it is possible to transit to other modes.
+%\[
+%  \mathsl{InitModeAnalysis1} = %
+%  \\ %
+%  \t1 \mathsl{SKIP} \intchoice \mathsl{EnterMode}(\mathsf{normal})
+%  \intchoice \mathsl{EnterMode}(\mathsf{degraded}) \intchoice
+%  \mathsl{EnterMode}(\mathsf{emergencyStop})
+%  \also %
+%  \mathsl{NormalModeAnalysis1} = \mathsl{SKIP} \intchoice
+%  \mathsl{EnterMode}(\mathsf{rescue}) \intchoice
+%  \mathsl{EnterMode}(\mathsf{degraded})
+%  \also %
+%  \mathsl{DegradedModeAnalysis1} = \mathsl{SKIP} \intchoice
+%  \mathsl{EnterMode}(\mathsf{normal}) \intchoice
+%  \mathsl{EnterMode}(\mathsf{rescue})
+%  \also %
+%  \mathsl{RescueModeAnalysis1} = \mathsl{SKIP} \intchoice
+%  \mathsl{EnterMode}(\mathsf{normal}) \intchoice
+%  \mathsl{EnterMode}(\mathsf{degraded})
+%\]
+%Since the \( \mathsl{Controller} \)\/ is responsible for demanding
+%information and for generating reports, it is here that we place
+%bounds on the number of exchanges that are possible.  If we fail to do
+%this, then hiding these exchanges will lead to divergence.
+%\[
+%  limit = 8
+%  \also %
+%  \mathsl{Get}(\mathsl{event},n) =\ \If n > 0 \Then \mathsl{event}
+%  \then \mathsl{Get}(\mathsl{event},n-1) \Else \mathsl{SKIP}
+%  \also %
+%  \mathsl{GetInformation}(n) = \mathsl{Get}(\mathsl{ainfo},n)
+%  \also %
+%  \mathsl{PutReports}(n) = \mathsl{Get}(\mathsl{areport},n)
+%\]
+%We add a simple mode variable to the \( \mathsl{Controller} \)\/ and
+%then add the result to the \( \mathsl{TAnalyser} \), hiding the
+%internal interfaces.
+%\[
+%  \mathsl{TAController1} =
+%  \\ %
+%  \t1
+%  \begin{zedblock}
+%    (\
+%    \begin{zedblock}
+%      \mathsl{TAnalyser1}
+%      \\ %
+%      \parallel [ TAControllerInterface1 ]
+%      \\ %
+%      (\
+%      \begin{zedblock}
+%        \mathsl{Controller1}
+%        \\ %
+%        \parallel [ ModeStateInterface ]
+%        \\ %
+%        \mathsl{ModeState}
+%      \end{zedblock}
+%      \\ %
+%      ) \hide ModeStateInterface
+%    \end{zedblock}
+%    \\ %
+%    ) \hide TAControllerInterface1
+%  \end{zedblock}
+%\]
+%The composition is free from livelock.
+%\[
+%  \mathbf{assert}\ \mathsl{TAController1} %
+%  : [ \hbox{ livelock free } [FD] ]
+%\]
+%Notice that the composition isn't deadlock free, since the \(
+%\mathsl{Analyser} \)\/ can perform the trace
+%\[
+%  \langle~ \mathsl{startcycle}, \mathsl{ainput}, \mathsl{startexec}, %
+%  \mathsl{afailuresrepairs} ~\rangle
+%\]
+%whilst at the same time, the \( \mathsl{Controller} \)\/ can perform
+%the trace
+%\[
+%  \langle~ \mathsl{startexec}, \mathsl{startreport} ~\rangle %
+%\]
+%This corresponds to the \( \mathsl{Analyser} \) having completed a
+%cycle of behaviour in which its information service was not required,
+%but the \( \mathsl{Controller} \) paradoxically being in a state where
+%it actually requires the service.  This paradox is resolved by the
+%interaction between the \( \mathsl{Controller} \) and the \(
+%\mathsl{Reporter} \), which requires that the \(
+%\mathsl{afailuresrepairs} \) event occurs only after the \(
+%\mathsl{Controller} \) has completed its requirement for the
+%information service.
+%
+%The \( \mathsl{Reporter} \)\/ starts its cycle with a \(
+%\mathsl{startreport} \)\/ event.
+%\[
+%  \mathsl{Reporter1} = \mathsl{startreport} \then \mathsl{ReportService1} %
+%\]
+%Following this, it repeatedly gathers \( \mathsl{areport} \)\/ events,
+%paying particular attention to the mode that the \(
+%\mathsl{Controller} \)\/ is in, until it receives the signal to end
+%the report phase, whereupon it does some tidying up.  An \(
+%\mathsf{emergencyStop} \)\/ mode is serious enough to terminate the
+%cycle.
+%\[
+%  \mathsl{ReportService1} = %
+%  \\ %
+%  \t1
+%  \begin{zedblock}
+%    \Extchoice m: NonEmergencyModes \spot \mathsl{reportmode}.m \then
+%    \mathsl{putmode}\,!m \then \mathsl{ReportService1}
+%    \\ %
+%    \extchoice
+%    \\ %
+%    \mathsl{areport} \then \mathsl{ReportService1}
+%    \\ %
+%    \extchoice
+%    \\ %
+%    \mathsl{reportmode}.emergencyStop \then
+%    \mathsl{putmode}\,!emergencyStop \then \mathsl{TidyUp1}
+%    \\ %
+%    \extchoice
+%    \\ %
+%    \mathsl{TidyUp1}
+%  \end{zedblock}
+%\]
+%Tidying up involves fetching some information from the \(
+%\mathsl{Analyser} \)\/ about recently failed devices and
+%acknowledgements of information about repairs, dispatching the output
+%to the physical units, and informing the \( \mathsl{Analyser} \) about
+%the commands sent to the pumps.
+%\[
+%  \mathsl{TidyUp1} = %
+%  \\ %
+%  \t1
+%  \begin{zedblock}
+%    \mathsl{endreport} \then
+%    \\ %
+%    \t1
+%    \begin{zedblock}
+%      \mathsl{afailuresrepairs} \then
+%      \\ %
+%      \t1
+%      \begin{zedblock}
+%        \mathsl{getmode}\,?m \then
+%        \\ %
+%        \t1
+%        \begin{zedblock}
+%          \mathsl{aoutput}\,!m \then
+%          \\ %
+%          \t1
+%          \begin{zedblock}
+%            \mathsl{apumps} \then
+%            \\ %
+%            \t1 \mathsl{Reporter1}
+%          \end{zedblock}
+%        \end{zedblock}
+%      \end{zedblock}
+%    \end{zedblock}
+%  \end{zedblock}
+%\]
+%We add the \( \mathsl{Reporter} \)\/ to the rest of the components,
+%hiding the internal interface.
+%\[
+%  \mathsl{TACReporter1} =
+%  \\ %
+%  \t1
+%  \begin{zedblock}
+%    (\
+%    \begin{zedblock}
+%      \mathsl{TAController1}
+%      \\ %
+%      \parallel [ TACReporterInterface1 ]
+%      \\ %
+%      (\
+%      \begin{zedblock}
+%        (\
+%        \begin{zedblock}
+%          \mathsl{Reporter1}
+%          \\ %
+%          \parallel [ ModeStateInterface ]
+%          \\ %
+%          \mathsl{ModeState}
+%        \end{zedblock}
+%        \\ %
+%        ) \hide ModeStateInterface
+%      \end{zedblock}
+%      \\ %
+%      )
+%    \end{zedblock}
+%    \\ %
+%    ) \hide TACReporterInterface1
+%  \end{zedblock}
+%\]
+%The entire composition is free from deadlock and from livelock.
+%\[
+%  \mathbf{assert}\ \mathsl{TACReporter1} :[ \hbox{ deadlock free } [FD] ]
+%  \also %
+%  \mathbf{assert}\ \mathsl{TACReporter1} :[ \hbox{ livelock free } [FD] ]
+%\]
+%These communicating processes form our abstract view of the
+%steam boiler.
+%\[
+%  \mathsl{SteamBoiler1} = \mathsl{TACReporter1} %
+%\]
+%
+%FDR code for the abstract steam boiler is contained in
+%appendix~\ref{appendix:FDR-code}.  All assertions have been
+%successfully checked.  The next four chapters contain the \Circus\
+%specification of each process.  Collectively, they refine the abstract
+%specification given here.  Appendix~\ref{appendix:FDR-code} contains
+%two pure CSP descriptions: the one described in this chapter, and
+%another that is derived from the \Circus\ specification by abstracting
+%from most of the state details.  The refinement has been checked by
+%FDR.
+
+\chapter{The $\mathsl{Timer}$}
+
+The header of a \Circus\ model must include $circus\_toolkit$ as its parents.
+\begin{zsection}
+	\SECTION\ SteamBoiler \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{circus}
+    \circchannel\ clocktick, startcycle
+\end{circus}
+
+In the original model, the $time$ is initialised to $cyclelimit$ by an assignment $time := cyclelimit$. In this model, we modify it to a schema expression $\lschexpract InitTimer \rschexpract$. They are semantically equal. The reason of this modification is because, with this schema, in the final resultant $CSP \parallel Z$ model, $time$ is initialised in the early stage (during ``initialisation'' of the model) instead of in the later stage by the linked assignment in CSP. This will make the model checker easier to find the initial state. 
+
+The $\mod$ operator binds more tightly than $+$ operator (albeit, it is not the case in mathematics), thus 
+\[(~time := time + 1 \mod cycletime ~)\]
+will not get the expected result. It is corrected by adding additional brackets.
+
+\begin{circus}
+   \circprocess\ Timer ~\circdef~ \circbegin \\
+     \t1 cycletime == 5 \\ %
+     \t1 cyclelimit == cycletime - 1 \\ %
+     \t1 Time == 0 \upto cyclelimit \\
+     \t1 \circstate\ TimeState == [~ time: Time ~] \\ %
+     \t1 InitTimer == [~ TimeState~' | time' = cyclelimit ~] \\
+     \t1 TimeOp == [~ \Delta TimeState | time' \geq time ~] \\
+     \t1 TCycle \circdef (~time := (time + 1) \mod cycletime ~) \circseq \\ % rye: should not be time + 1 \mod cycletime
+            \t2 (\circif\ time = 0 \circthen startcycle \then \Skip\ \circelse\ time \neq 0 \circthen \Skip\ \circfi) \circseq \\ %
+            \t2 clocktick \then TCycle
+            \\
+      %\t1 \circspot time := cyclelimit \circseq TCycle \\
+      \t1 \circspot \lschexpract InitTimer \rschexpract \circseq TCycle \\
+   \circend
+\end{circus}
+
+\chapter{The $\mathsl{Analyser}$}
+\section{Parameters}
+%\begin{itemize}
+%    \item C - the capacity of the boiler
+%    \item P - the capacity of a pump 
+%    \item U\_1 - the maximum gradient of increase 
+%    \item U\_2 - the maximum gradient of decrease 
+%    \item W - the maximum output rate for the boiler 
+%\end{itemize}
+
+$MAX\_NUM$ and $NUMS$ are introduced just for facilitating the animation.
+\begin{axdef}
+  MAX\_NUM: \nat
+\end{axdef}
+
+\begin{zed}
+  NUMS == 0 \upto MAX\_NUM
+\end{zed}
+
+\begin{axdef}
+  C, P, U\_1~, U\_2~, W: NUMS
+\end{axdef}
+
+%\begin{itemize}
+%    \item M\_1 - the minimum water level  
+%    \item M\_2 - the maximum water level  
+%    \item N\_1 - the minimum normal quantity of water 
+%    \item N\_2 - the maximum normal quantity of water 
+%\end{itemize}
+\begin{axdef}
+  M\_1~, N\_1~, N\_2~, M\_2: NUMS
+\where %
+  M\_1 \leq N\_1 \leq N\_2 \leq M\_2
+\end{axdef}
+
+\section{Sensor}
+
+\begin{zed}
+  Unit[X] == [~ a\_1~, a\_2: NUMS; st: X | a\_1 \leq a\_2 ~]
+\end{zed}
+
+\begin{zed}
+  SState ::= sokay | sfailed
+\end{zed}
+
+\begin{zed}
+  QSensor == Unit[SState][qa\_1~/a\_1~, qa\_2~/a\_2~, qst/st]
+\end{zed}
+
+\begin{zed}
+  InitQSensor == [~ QSensor~' | qa\_1' = 0 \land qa\_2' = C \land qst' = sokay ~]
+\end{zed}
+
+\begin{zed}
+  VSensor == Unit[SState][va\_1~/a\_1~, va\_2~/a\_2~, vst/st]
+  \also %
+  InitVSensor == [~ VSensor~' | va\_1' = 0 \land va\_2' = 0 \land vst' = sokay ~]
+\end{zed}
+
+\section{Pump}
+\begin{zed}
+  PState ::= popen | pwaiting | pclosed | pfailed
+\end{zed}
+
+$Pump0$ is rewritten to give a small size set $\set{0, P}$ as $pa$'s type to ease model checking. Since the values of $pa\_1$ and $pa\_2$ are implied from the pump state and not the input value from environment, it is safe to reduce the size of their type.
+\begin{zed}
+  % Pump0 == Unit[PState][pa\_1~/a\_1~, pa\_2~/a\_2~, pst/st]
+  % rye: to decrease the size of set for pa
+  Pump0 == [~ pa\_1~, pa\_2: \{0, P\}; pst: PState | pa\_1 \leq pa\_2 ~]
+\end{zed}
+
+\begin{zed}
+  PumpOpen == [~ Pump0 | pst = popen \implies (pa\_1 = P \land pa\_2 = P) ~]
+\end{zed}
+
+\begin{zed}
+  PumpWaitingOrClosed == [~ Pump0 | \\
+      \t1 (pst = pwaiting \lor pst = pclosed) \implies (pa\_1 = 0 \land pa\_2 = 0) ~]
+\end{zed}
+
+\begin{zed}
+  Pump == PumpOpen \land PumpWaitingOrClosed
+\end{zed}
+
+\begin{zed}
+  InitPump == [~ PumpWaitingOrClosed~' | pst' = pclosed ~]
+\end{zed}
+
+\begin{zed}
+  PCState ::= pcflow | pcnoflow | pcfailed \\
+  PumpCtr0 == [~ Pump; pcst: PCState ~]
+\end{zed}
+
+\begin{zed}
+  POpenPCFlowOrFailed == [~ PumpCtr0 | \\
+      \t1 pst = popen \implies (pcst = pcflow \lor pcst = pcfailed) ~]
+\end{zed}
+
+\begin{zed}
+  PWaitingPCNoFlowOrFailed == [~ PumpCtr0 | \\
+      \t1 pst = pwaiting \implies (pcst = pcnoflow \lor pcst = pcfailed) ~]
+\end{zed}
+
+\begin{zed}
+  PClosedPCNoFlowOrFailed == [~ PumpCtr0 | \\
+      \t1 pst = pclosed \implies (pcst = pcnoflow \lor pcst = pcfailed) ~]
+\end{zed}
+
+\begin{zed}
+  PFailedPCFlow == [~ PumpCtr0 | \\
+      \t1 (pst = pfailed \land pcst = pcflow) \implies (pa\_1 = P \land pa\_2 = P) ~]
+\end{zed}
+
+\begin{zed}
+  PFailedPCNoFlow == [~ PumpCtr0 | \\
+      \t1 (pst = pfailed \land pcst = pcnoflow) \implies (pa\_1 = 0 \land pa\_2 = 0) ~]
+\end{zed}
+
+\begin{zed}
+  PFailedPCFailed == [~ PumpCtr0 | \\
+      \t1 (pst = pfailed \land pcst = pcfailed) \implies (pa\_1 = 0 \land pa\_2 = P) ~]
+\end{zed}
+
+%PumpCtr = {
+%    (pa_1.0, pa_2.0, pcst.pcfailed, pst.pclosed),
+%    (pa_1.0, pa_2.0, pcst.pcfailed, pst.pwaiting),
+%    (pa_1.0, pa_2.P, pcst.pcfailed, pst.pfailed),
+%    (pa_1.P, pa_2.P, pcst.pcfailed, pst.popen),
+%    (pa_1.0, pa_2.0, pcst.pcnoflow, pst.pclosed),
+%    (pa_1.0, pa_2.0, pcst.pcnoflow, pst.pfailed)
+%    (pa_1.0, pa_2.0, pcst.pcnoflow, pst.pwaiting),
+%    (pa_1.P, pa_2.P, pcst.pcflow, pst.pfailed),
+%    (pa_1.P, pa_2.P, pcst.pcflow, pst.popen),
+%}
+
+% all possible state of a pump 
+%PumpCtr = {
+%    (pa_1.0, pa_2.0, pcst.pcfailed, pst.pclosed),
+%    (pa_1.0, pa_2.0, pcst.pcfailed, pst.pwaiting),
+%    (pa_1.0, pa_2.P, pcst.pcfailed, pst.pfailed),
+%    (pa_1.P, pa_2.P, pcst.pcfailed, pst.popen),
+%    (pa_1.0, pa_2.0, pcst.pcnoflow, pst.pclosed),
+%    (pa_1.0, pa_2.0, pcst.pcnoflow, pst.pfailed),
+%    (pa_1.0, pa_2.P, pcst.pcnoflow, pst.pfailed),
+%    (pa_1.P, pa_2.P, pcst.pcnoflow, pst.pfailed)
+%    (pa_1.0, pa_2.0, pcst.pcnoflow, pst.pwaiting),
+%    (pa_1.P, pa_2.P, pcst.pcflow, pst.pfailed),
+%    (pa_1.P, pa_2.P, pcst.pcflow, pst.popen),
+%}
+\begin{zed}
+  PumpCtr == \\ %
+  \t1 POpenPCFlowOrFailed \land PWaitingPCNoFlowOrFailed \land \\ %
+  \t1 PClosedPCNoFlowOrFailed \land PFailedPCFlow \land PFailedPCNoFlow \land  \\
+  \t1 PFailedPCFailed
+\end{zed}
+
+\begin{zed}
+  InitPumpCtr == [~ PumpCtr~' | InitPump \land pcst' = pcnoflow ~]
+\end{zed}
+
+\begin{zed}
+  PumpIndex == 1 \upto 4
+\end{zed}
+
+The names of $pa\_1$ and $pa\_2$ are changed to $pta\_1$ and $pta\_2$ to avoid confusion. And their types are changed as well due to the same reason as $pa\_1$ and $pa\_2$ in $Pump0$.
+\begin{schema}{PumpCtrSystem}
+  pumpctr: PumpIndex \fun PumpCtr
+  \\ %
+  %pa\_1~, pa\_2: NUMS
+  %rye: minimise the size of set for pa and use pta (pump total adjusted value) to differentiate
+  pta\_1~, pta\_2: \{0, P, 2*P, 3*P, 4*P\} 
+  \where %
+  pta\_1 =
+   %
+    ( pumpctr~1 ).pa\_1 + ( pumpctr~2 ).pa\_1 +  %
+    \\ \t1 %
+    ( pumpctr~3 ).pa\_1 + ( pumpctr~4 ).pa\_1   %
+  \also %
+  pta\_2 =
+   %
+    ( pumpctr~1 ).pa\_2 + ( pumpctr~2 ).pa\_2 +  %
+    \\ \t1 %
+    ( pumpctr~3 ).pa\_2 + ( pumpctr~4 ).pa\_2  %
+\end{schema}
+
+\begin{schema}{InitPumpCtrSystem}
+  PumpCtrSystem~'
+  \where %
+  \exists InitPumpCtr @
+  \\ %
+  \t1 \forall i: PumpIndex @ pumpctr'~i = \theta PumpCtr~'
+\end{schema}
+
+\section{Valve}
+
+A freetype $VAction$ and a schema $SetValveState$ are added to update valve's state according to the output signal sent to the physical units. If this program sends $openValve$ (or $closeValve$), then its action is $openv$ (or $closev$) and its state should be $vopen$ (or $vclosed$). Otherwise, if none of $openValve$ and $closeValve$ is issued, then it is $VNoChange$ and its state is unchanged.
+\begin{zed}
+  VState ::= vopen | vclosed
+  \also %
+  VAction ::= openv | closev | VNoChange 
+  \also %
+  Valve == [~ valve: VState ~]
+  \also %
+  InitValve == [~ Valve~' | valve' = vclosed ~]
+  \also %
+  SetValveState == [~ \Delta Valve; vstate?: VAction | \\
+      \t1 (vstate? = VNoChange \implies valve' = valve) \land \\
+      \t1 (vstate? = openv \implies valve' = vopen) \land \\
+      \t1 (vstate? = closev \implies valve' = vclosed) ~]
+\end{zed}
+
+\section{Expected values}
+\begin{zed}
+  CValues == [~ qc\_1~, qc\_2~, vc\_1~, vc\_2: NUMS ~]
+\end{zed}
+
+\begin{zed}
+  InitCValues == [~ CValues~' | qc\_1' = 0 \land qc\_2' = C \land vc\_1' = 0 \land vc\_2' = W ~]
+\end{zed}
+
+\begin{zed}
+  QLowerBoundValveOpen == [~ CValues; Valve | valve = vopen \land qc\_1 = 0 ~]
+\end{zed}
+
+\begin{zed}
+  QLowerBoundValveClosed ==
+  \\ % rye: here pa\_1 should be total pa\_1 and not individual pump
+  \t1 [~ CValues; QSensor; VSensor; PumpCtrSystem; Valve | valve = vclosed \land \\
+     \t2 qc\_1 = max \{ 0, qa\_1 - 5 * va\_2 - 12 * U\_1 + 5 * pta\_1 \} ~]
+\end{zed}
+
+$qc\_2$ must be larger than or equal to 0.
+\begin{zed}
+  QUpperBound ==
+  \\ % rye: here pa\_2 should be total pa\_2 and not individual pump
+  \t1 [~ CValues; QSensor; VSensor; PumpCtrSystem | \\ %
+    % qc\_2 must >= 0
+    \t2 qc\_2 = max\{0, min \{ C, qa\_2 - 5 * va\_1 + 12 * U\_2 + 5 * pta\_2 \}\} ~]
+\end{zed}
+
+\begin{zed}
+  VLowerBound == [~ CValues; VSensor | vc\_1 = max \{ 0, va\_1 - 5 * U\_2 \} ~]
+\end{zed}
+
+$vc\_2 = min \{ W, va\_2 - 5 * U\_1 \}$ should be $vc\_2 = min \{ W, va\_2 + 5 * U\_1 \}$. 
+\begin{zed}
+  % rye: should be +, instead of -
+  % add  (va\_2 = 0 \implies vc\_2 = W)
+  %VUpperBound == [~ CValues; VSensor | (va\_2 = 0 \implies vc\_2 = W) \lor (vc\_2 = min \{ W, va\_2 + 5 * U\_1 \}) ~]
+  VUpperBound == [~ CValues; VSensor | (vc\_2 = min \{ W, va\_2 + 5 * U\_1 \}) ~]
+\end{zed}
+
+\begin{zed}
+  InputPState == \{ popen, pclosed \}
+\end{zed}
+
+\begin{zed}
+  InputPCState == \{ pcflow, pcnoflow \}
+\end{zed}
+
+\begin{schema}{ExpectedPumpStates}
+  expectedp: PumpIndex \fun InputPState
+  \\ %
+  expectedpc: PumpIndex \fun InputPCState
+\end{schema}
+
+We add a schema $InitExpectedPumpStates$ to initialise the expected pump states though their initial states can be arbitrarily chosen. In addition, we use abnormal combination of the pump state $pclosed$ and the pump controller state $pcflow$ to indicate this initial value should not be used to check again input pump and pump controller states.    
+% rye: use the impossible combination of (pclosed, pcflow) [it's impossible for the future update by CalcExpectedPumpState] to indicate it is in initialisation stage so don't check against expected state
+\begin{schema}{InitExpectedPumpStates}
+    ExpectedPumpStates~' 
+    \where
+    expectedp' = \{ 1 \mapsto pclosed, 2 \mapsto pclosed, 3 \mapsto pclosed, 4 \mapsto pclosed\}\\ 
+    expectedpc' = \{1 \mapsto pcflow, 2 \mapsto pcflow, 3 \mapsto pcflow, 4 \mapsto pcflow\}\\ 
+\end{schema}
+
+This schema $CalcExpectedPumpState$ is added to update expected pump and pump controller states according to output pump states to the physical units. If the output pump state is $popen$, then the expected pump state is $popen$ as well and the pump controller state will be $pcflow$. Otherwise, $pclosed$ and $pcnoflow$ respectively. At the same time, the pump state is changed to $pwaiting$ in case the pump is expected to be opened from closed.
+% rye: update expected pumpState according to pumpState sent to the pumps in Reporter
+% if current expectedp = pclosed, and pumpstate?~i = popen, then also turn this pump's current state to pwaiting
+\begin{schema}{CalcExpectedPumpState}
+    \Delta ExpectedPumpStates \\
+    \Delta PumpCtrSystem \\
+    pumpstate?: PumpIndex \fun InputPState
+    \where
+    \forall i:PumpIndex @ \\
+        \t1 ( \\
+            \t2(expectedp'~i = pumpstate?~i) \land \\
+            \t2 ( \\
+            \t3 (pumpstate?~i = popen \land expectedpc'~i = pcflow) \lor \\
+            \t3 (pumpstate?~i = pclosed \land expectedpc'~i = pcnoflow)\\
+            \t2 ) \\
+        \t1 ) \land \\
+        \t1 ( \\
+            \t2 ( (pumpctr'~i).pst = \\
+                \t3 \IF (expectedp~i = pclosed \land \\
+                \t4 pumpstate?~i = popen \land \\
+                \t4 (pumpctr~i).pst = pclosed) \\
+                \t3 \THEN \\
+                \t4 pwaiting \\
+                \t3 \ELSE  \\
+                \t4 (pumpctr~i).pst \\
+            \t2 ) \land \\
+            \t2 (pumpctr'~i).pcst = (pumpctr~i).pcst \\
+        \t1 )
+\end{schema}
+
+\begin{zed}
+  Equipment0 ==
+  \\ %
+  \t1
+    QSensor \land VSensor \land PumpCtrSystem \land Valve \land \\ %
+  \t1  CValues \land ExpectedPumpStates
+\end{zed}
+
+\section{Failures and repairs}
+
+\begin{zed}
+  QFailed == [~ QSensor | qst = sfailed ~]
+  \also %
+  VFailed == [~ VSensor | vst = sfailed ~]
+  \also %
+  PFailed == [~ PumpCtrSystem | \\
+      \t1 (~ \exists i: PumpIndex \spot (pumpctr~i).pst = pfailed ~) ~]
+  \also %
+  PCFailed == [~ PumpCtrSystem | \\
+      (~ \exists i: PumpIndex \spot (pumpctr~i).pcst = pcfailed ~) ~]
+\end{zed}
+
+\begin{zed}
+  UnitFailure ::= qfail | vfail | pfail \ldata PumpIndex \rdata | pcfail \ldata PumpIndex \rdata
+  \also %
+  Failures == [~ failures, noacks: \power UnitFailure | noacks \subseteq failures ~]
+\end{zed}
+
+The original schema uses \[(~ u = pfail~i \land PFailed ~) \] to calculate pump failures. However, since $PFailed$ holds if at least one of pumps is failed, the schema results in pump failures for all pumps. Finally, the schema is updated to check pump failures against individual pump state directly by \[(~ u = pfail~i \land (pumpctr~i).pst = pfailed ~) \]. This is the same case as $pcfail$.
+
+\begin{schema}{EquipmentFailures}
+  Equipment0
+  \\ %
+  Failures
+  \where %
+  failures =
+  \\ %
+  \t1
+    \{~ u: UnitFailure; i: PumpIndex | \\ %
+    \t2 (~ u = qfail \land QFailed ~) \lor {} \\
+    \t2 (~ u = vfail \land VFailed ~) \lor {} %
+      \\ %
+    \t2 (~ u = pfail~i \land (pumpctr~i).pst = pfailed ~) \lor {} \\
+    \t2 (~ u = pcfail~i \land (pumpctr~i).pcst = pcfailed ~) \\
+     \t1 @ u ~\}
+%    \t2
+%      (~ u = qfail \land QFailed ~) \lor {} %
+%      (~ u = vfail \land VFailed ~) \lor {} %
+%      \\ %
+%    \t2
+%      (~ u = pfail~i \land PFailed ~) \lor {} %
+%      (~ u = pcfail~i \land PCFailed ~) @ u ~\}
+\end{schema}
+
+\begin{zed}
+  InitFailures == [~ Failures~' | failures' = \emptyset \land noacks' = \emptyset ~]
+\end{zed}
+
+\begin{zed}
+  FailuresExpected ==
+  \\ %
+  \t1 [~ Failures; failureacks: \power UnitFailure | failureacks \subseteq noacks ~]
+  \also %
+  AcceptFailureAcks ==
+  \\ %
+  \t1 [~ \Delta Failures; FailuresExpected | noacks' = noacks \setminus failureacks ~]
+\end{zed}
+
+\begin{zed}
+  RepairsExpected ==
+  \\ %
+  \t1 [~ Failures; repairs: \power UnitFailure | repairs \subseteq failures ~]
+  \also %
+  AcceptRepairs == [~ \Delta Failures; RepairsExpected | \\ %
+    \t1 failures' = failures \setminus repairs \land noacks' = noacks \setminus repairs ~]
+\end{zed}
+
+The schema $UpdateFailuresAck$ is added to update $noacks$ according to input $failureacks?$ and $repairs?$. 
+\begin{itemize}
+    \item For the new failures identified in this cycle, we add them to $noacks$ to state they are not acknowledged.
+    \item If $failureacks?$ is accepted, that is $failureacks? \subseteq noacks$, we take these acknowledged failures  out of $noacks$.
+    \item If $repairs?$ is accepted, that is $repairs? \subseteq failures$, we take these repaired failures  out of $noacks$.
+\end{itemize}
+
+\begin{schema}{UpdateFailuresAck}
+    \Delta Failures \\
+    failureacks?: \power UnitFailure \\
+    repairs?: \power UnitFailure
+    \where
+    \exists newnoacks: \power UnitFailure @ ( \\
+        \t1 (newnoacks = noacks \cup (failures' \setminus failures)) \land \\ % new failures are added in noack
+        \t1 ( \\
+            % normal case: both are accepted
+            \t2 (((failureacks? \subseteq noacks) \land (repairs? \subseteq failures)) \\
+            \t3    \implies (noacks' = newnoacks \setminus (failureacks? \cup repairs?))) \land \\
+            % repairs is not accepted 
+            \t2 (((failureacks? \subseteq noacks) \land \lnot (repairs? \subseteq failures)) \\ 
+            \t3    \implies (noacks' = newnoacks \setminus failureacks?)) \land \\
+            % failureacks is not accepted 
+            \t2 ((\lnot (failureacks? \subseteq noacks) \land (repairs? \subseteq failures)) \\
+            \t3    \implies (noacks' = newnoacks \setminus repairs?)) \land \\
+            % both are not accepted 
+            \t2 ((\lnot (failureacks? \subseteq noacks) \land \lnot (repairs? \subseteq failures)) \\
+            \t3    \implies (noacks' = newnoacks)) \\
+        \t1 ) \\
+    )
+\end{schema}
+
+\begin{zed}
+  Equipment == (~ QLowerBoundValveOpen \lor QLowerBoundValveClosed ~) \land {} \\
+    \t1 QUpperBound \land VLowerBound \land VUpperBound \land {} \\
+    \t1 ExpectedPumpStates \land EquipmentFailures
+\end{zed}
+
+In $InitEquipment$, expected pump and pump controller states and valve state are initialised as well.
+\begin{zed}
+  InitEquipment == Equipment0~' \land InitQSensor \land InitVSensor \land \\
+    \t1 InitPumpCtrSystem \land InitCValues \land InitFailures \land \\
+    \t1 InitExpectedPumpStates \land InitValve
+    %InitPumpCtrSystem \land InitFailures \land InitExpectedPumpStates \land InitValve
+\end{zed}
+
+\subsection{Repair Failed Equipments}
+
+This is a newly added section to repair equipments according to input $repairs?$. 
+
+For $QSensor$, if it is repaired, then its $qst$ will be $sokay$. Otherwise it stays unchanged.
+\begin{schema}{RepairQSensor}
+  \Delta QSensor \\
+  repairs?: \power UnitFailure
+  \where
+  qa\_1' = qa\_1 \\
+  qa\_2' = qa\_2 \\
+  qfail \in repairs? \implies qst' = sokay \\
+  qfail \notin repairs? \implies qst' = qst
+\end{schema}
+
+For $VSensor$, if it is repaired, then its $vst$ will be $sokay$. Otherwise it stays unchanged.
+\begin{schema}{RepairVSensor}
+  \Delta VSensor \\
+  repairs?: \power UnitFailure
+  \where
+  va\_1' = va\_1 \\
+  va\_2' = va\_2 \\
+  vfail \in repairs? \implies vst' = sokay \\
+  vfail \notin repairs? \implies vst' = vst
+\end{schema}
+
+If a pump controller is repaired, its state will be $pcflow$ if current pump state is $popen$, or its state will be $pcnoflow$ if current pump state is not $popen$.
+\begin{schema}{RepairAPumpCtr}
+  \Delta PumpCtr
+  \where
+  pst' = pst \\
+  pst = popen \implies pcst' = pcflow \\
+  pst \neq popen \implies pcst' = pcnoflow
+\end{schema}
+
+If a pump is repaired, its state will be $pclosed$ and its pump controller state stays unchanged. 
+\begin{schema}{RepairAPump}
+  \Delta PumpCtr
+  \where
+  pst' = pclosed \\ % after repair, pump is going to closed state
+  pcst' = pcst
+\end{schema}
+
+If both a pump and its controller are repaired, then the pump will be $pclosed$ and its controller will be $pcnoflow$.
+\begin{schema}{RepairPumpCtrAndPump}
+  \Delta PumpCtr
+  \where
+  pst' = pclosed \\
+  pcst' = pcnoflow
+\end{schema}
+
+The schema $RepairPumps$ repairs all pumps and their controllers according to input $repairs?$.
+\begin{schema}{RepairPumps}
+  \Delta PumpCtrSystem \\
+  repairs?: \power UnitFailure \\
+  \where %
+  \forall i: PumpIndex @ \\ 
+  \t1 \exists PumpCtr; PumpCtr~' @ ( \\
+    \t2 (\theta PumpCtr~' = pumpctr'~i) \land (\theta PumpCtr = pumpctr~i) \land \\
+        % only pump is repaired
+    \t2 ((pfail~i \in repairs? \land pcfail~i \notin repairs?) \\
+        \t3 \implies RepairAPump) \land \\
+        % only pump ctr is repaired
+    \t2 ((pfail~i \notin repairs? \land pcfail~i \in repairs?) \\
+        \t3 \implies RepairAPumpCtr) \land \\
+        % both pump and pump ctr are repaired
+    \t2 ((pfail~i \in repairs? \land pcfail~i \in repairs?) \\
+        \t3 \implies RepairPumpCtrAndPump) \land \\
+        % both pump and pump ctr are not repaired
+    \t2 ((pfail~i \notin repairs? \land pcfail~i \notin repairs?) \\
+        \t3 \implies \theta PumpCtr~' = \theta PumpCtr) \\
+  \t1 )
+\end{schema}
+
+The $RepairEquipments$ tries to repair all equipments according to input $repairs?$. If $repairs?$ are accepted, all equipments will be repaired. Otherwise, all equipments will stay unchanged.
+\begin{zed}
+    RepairEquipments == \\
+    \t1 (RepairsExpected[repairs?~/repairs~] \land \\
+        \t2 RepairPumps \land RepairQSensor \land RepairVSensor\\
+    \t1 ) \lor \\
+    \t1 ((\lnot RepairsExpected[repairs?~/repairs~]) \land \\
+        \t2 \Xi PumpCtrSystem \land \Xi QSensor \land \Xi VSensor\\
+    \t1 )
+\end{zed}
+
+A $emergencyCond$ state is introduced to indicate if both input $repairs?$ and $failureacks?$ are accepted or not. It is set to 1 if there is unaccepted $repairs?$ or $failureacks?$, or both. Otherwise, it is set to 0. This update happens in the beginning of each cycle and the value is used in the later of the cycle.
+\begin{zed}
+    % check if repairs? and failureacks? are acceptable or not 
+    EmergenyCond == [~ emergencyCond: \{0,1\} ~] \\ % rye
+    MarkEmergencyCond == [~ \Delta EmergenyCond | emergencyCond' = 1 ~] \\
+    ClearEmergencyCond == [~ \Delta EmergenyCond | emergencyCond' = 0 ~] \\
+    EvalRepairFailureAck == \\ 
+        \t1 (RepairsExpected[repairs?~/repairs~] \land \\
+            \t2 FailuresExpected[~failureacks?~/failureacks~] \land \\
+            \t2 ClearEmergencyCond\\
+        \t1 ) \lor \\
+        \t1 ( (\lnot RepairsExpected[repairs?~/repairs~] \lor \\
+            \t2 \lnot FailuresExpected[~failureacks?~/failureacks~]) \\
+            \t2 \land MarkEmergencyCond \\
+        \t1 )  \\
+\end{zed}
+
+\section{Input messages}
+
+\begin{zed}
+  InputSignal ::= \\
+  \t1 stop | steamBoilerWaiting | physicalUnitsReady | transmissionFailure
+\end{zed}
+
+\begin{schema}{UnitState}
+  pumpState: PumpIndex \fun InputPState \\ %
+  pumpCtrState: PumpIndex \fun InputPCState \\ %
+  q, v: NUMS
+\end{schema}
+
+\begin{schema}{InputMsg}
+  signals: \power InputSignal \\ %
+  UnitState \\ %
+  failureacks, repairs: \power UnitFailure
+\end{schema}
+
+\section{Analysing messages}
+
+The input value $x?$ should be checked against calculated values $c\_1$ and $c\_2$, instead of adjusted values $a\_1$ and $a\_2$.
+\begin{zed}
+  %Expected == [~ x?, a\_1~, a\_2 : NUMS | a\_1 \leq x? \leq a\_2 ~] \\
+  Expected == [~ x?, c\_1~, c\_2 : NUMS | c\_1 \leq x? \leq c\_2 ~] \\ % rye: should check calculated value c_1 and c_2
+  Unexpected == \lnot Expected 
+\end{zed}
+
+\begin{zed}
+  Sensor == [~ \Delta Unit[SState]; c\_1~, c\_2~, c\_1'~, c\_2'~, x?: NUMS ~]
+\end{zed}
+
+\begin{schema}{CheckAndAdjustSensor}
+  Sensor
+  \where %
+  Expected \implies st' = st \\ %
+  Unexpected \implies st' = sfailed \\ %
+  st' = sokay \implies a\_1' = x? \land a\_2' = x?  \\ %
+  st' = sfailed \implies a\_1' = c\_1 \land a\_2' = c\_2
+\end{schema}
+
+\begin{zed}
+  CheckAndAdjustQ == QSensor \land {} \\%
+    \t1 CheckAndAdjustSensor[\\
+      \t2 q?/x?, qa\_1~/a\_1~, qa\_2~/a\_2~, qc\_1~/c\_1~, qc\_2~/c\_2~, qst/st, \\ 
+      \t2 qa\_1'~/a\_1'~, qa\_2'~/a\_2'~, qc\_1'~/c\_1'~, qc\_2'~/c\_2'~, qst'/st']
+  \also %
+  CheckAndAdjustV == VSensor \land {} \\ %
+    \t1 CheckAndAdjustSensor[ \\
+      \t2 v?/x?, va\_1~/a\_1~, va\_2~/a\_2~, vc\_1~/c\_1~, vc\_2~/c\_2~, vst/st, \\ 
+      \t2 va\_1'~/a\_1'~, va\_2'~/a\_2'~, vc\_1'~/c\_1'~, vc\_2'~/c\_2'~, vst'/st']
+\end{zed}
+
+The $ExpectedPumpStateTBD$ checks if the expected pumps and their controllers state are undetermined. This happens in the initialisation stage when the expected states are unknown. And we indicate this in $InitExpectedPumpStates$.  
+\begin{schema}{ExpectedPumpStateTBD}
+  exppst: InputPState \\ %
+  exppcst: InputPCState
+  \where
+  exppst = pclosed \\
+  exppcst = pcflow
+\end{schema}
+
+If expected pump states are unknown, we adjust pumps and their controllers states according to input states only and will not check expected pump states. 
+% adjust when expected pump state is TBD
+\begin{schema}{CheckAndAdjustPumpTBD}
+  \Delta PumpCtr \\ %
+  pst?, exppst: InputPState \\ %
+  pcst?, exppcst: InputPCState
+  \where %
+  % pst? = popen \land pcst? = pcflow    => pst' = popen \land pcst' = pcflow 
+  % pst? = popen \land pcst? = pcnoflow    => pst' = pfailed \land pcst' = pcnoflow 
+  % pst? = pclosed \land pcst? = pcnoflow    => pst' = pclosed \land pcst' = pcnoflow 
+  % pst? = pclosed \land pcst? = pcflow    => pst' = pfailed \land pcst' = pcflow 
+  ((pst? = popen \land pcst? = pcflow) \lor (pst? = pclosed \land pcst? = pcnoflow)) \\
+  \t1  \implies (pst' = pst? \land pcst' = pcst?) \\
+  (pst? = popen \land pcst? = pcnoflow) \implies (pst' = pfailed \land pcst' = pcnoflow) \\
+  (pst? = pclosed \land pcst? = pcflow) \implies (pst' = pfailed \land pcst' = pcflow)
+\end{schema}
+
+%TODO: how to program pwaiting status???
+However, if expected pump states are valid, we adjust pumps and their controllers states according to input and expected pump states together.
+\begin{schema}{CheckAndAdjustPump}
+  \Delta PumpCtr \\ %
+  pst?, exppst: InputPState \\ %
+  pcst?, exppcst: InputPCState
+  \where %
+  % pst, if it is failed, it is always failed until it is repaired.
+  ((pst = pfailed \land pst' = pst) \lor \\
+    \t1 (pst \neq pfailed \land \\
+        \t2 (pst? = exppst \implies pst' = pst?) \land \\
+        \t2 (pst? \neq exppst \implies pst' = pfailed)\\
+    \t1 ) \\
+  ) \\
+  % pcst, if it is failed, it is always failed until it is repaired.
+  ((pcst = pcfailed \land pcst' = pcst) \lor \\
+    \t1 (pcst \neq pcfailed \land \\
+        \t2 (pcst? = exppcst \implies pcst' = pcst?) \land \\
+        \t2 (pcst? \neq exppcst \implies pcst' = pcfailed)\\
+    \t1 )\\
+  ) \\
+\end{schema}
+
+\begin{schema}{PromotePumpCheck}
+  \Delta PumpCtr \\ %
+  \Delta PumpCtrSystem \\ %
+  ExpectedPumpStates \\ %
+  pst?, exppst: InputPState \\ %
+  pcst?, exppcst: InputPCState \\ %
+  pumpState?: PumpIndex \fun InputPState \\ %
+  pumpCtrState?: PumpIndex \fun InputPCState \\ %
+  i: PumpIndex
+  \where %
+  \theta PumpCtr = pumpctr~i \\ %
+  \theta PumpCtr~' = pumpctr'~i \\ % rye: set dashed variables
+  pst? = pumpState?~i \\ %
+  pcst? = pumpCtrState?~i \\ %
+  exppst = expectedp~i \\ %
+  exppcst = expectedpc~i
+\end{schema}
+
+\begin{zed}
+  % rye: change the predicate to forall then exists
+  SetPumpCtr == \forall i: PumpIndex @ \\
+    \t1 \exists PumpCtr; PumpCtr~'; pst?, exppst: PState; pcst?, exppcst: PCState  @ \\
+    \t2 (PromotePumpCheck \land \\
+        \t3 ((CheckAndAdjustPumpTBD \land ExpectedPumpStateTBD) \lor \\
+        \t4 (CheckAndAdjustPump \land \lnot ExpectedPumpStateTBD)\\
+        \t3 )\\
+    \t2 )
+%    \exists PumpCtr; PumpCtr~' @ %
+%      \forall pst?, exppst: PState; pcst?, exppcst: PCState; %
+%      i: PumpIndex  @ PromotePumpCheck \land CheckAndAdjustPump
+\end{zed}
+
+The original predicate of $StopPresent$ has correct. Just because we introduce $NUMS$ for animation, the predicate of $StopPresent$ is modified too. 
+\begin{schema}{StopPresent}
+  signals?: \power InputSignal \\ %
+  stops, stops': NUMS
+  \where %
+  stop \in signals?  \\ %
+  % stops' = stops + 1 % rye: continuously add by 1 will case it larger than NUMS. Therefore
+  ((stops + 1 > MAX\_NUM \land stops' = stops) \lor (stops' = stops + 1))
+\end{schema}
+
+\begin{schema}{StopNotPresent}
+  signals?: \power InputSignal \\ %
+  stops, stops': NUMS
+  \where %
+  stop \notin signals? \land stops < 3 \\ %
+  stops' = 0
+\end{schema}
+
+\begin{schema}{TooManyStops}
+  signals?: \power InputSignal \\ %
+  stops, stops': NUMS
+  \where %
+  stop \notin signals? \land stops \geq 3 \\ %
+  stops' = stops
+\end{schema}
+
+\begin{zed}
+  AdjustStops == StopPresent \lor StopNotPresent \lor TooManyStops
+\end{zed}
+
+\section{The $\mathsl{Analyser}$}
+
+\begin{circus}
+  \circchannel\ levelbelowmin, levelabovemax \\
+  % rename failures to cfailures to avoid name conflict since failures is also a schema component
+  \circchannel\ emergencystop, cfailures, levelokay, nonqfailure: \boolean \\
+  \circchannel\ physicalunitsready, qfailure, sbwaiting, vzero: \boolean
+\end{circus}
+
+For animation purpose, $input$ has been split into seven small channels: $input1$, $input2$, $input3$, $input4$, $input5$, $input6$, and $input7$.
+\begin{circus}
+  % additional channel defs
+  %\circchannel\ input: InputMsg \\ 
+
+  % rye: rewrite input channel definition
+%  \circchannel\ input:  (\power InputSignal) \cross % signals
+%                        (PumpIndex \fun InputPState) \cross % pumpState 
+%                        (PumpIndex \fun InputPCState) \cross % pumpCtrState 
+%                        (NUMS) \cross % q 
+%                        (NUMS) \cross % v
+%                        (\power UnitFailure) \cross % failureacks
+%                        (\power UnitFailure) % repairs 
+%                        \\
+
+  \circchannel\ input1: (\power InputSignal) \\
+  \circchannel\ input2: (PumpIndex \fun InputPState) \\ % pumpState 
+  \circchannel\ input3: (PumpIndex \fun InputPCState) \\ % pumpCtrState 
+  \circchannel\ input4: (NUMS) \\ % q 
+  \circchannel\ input5: (NUMS) \\ % v
+  \circchannel\ input6: (\power UnitFailure) \\ % failureacks
+  \circchannel\ input7: (\power UnitFailure) \\ % repairs 
+
+  \circchannel\ startexec \\ 
+\end{circus}
+
+\begin{circus}
+   \circchannel\ failuresrepairs: (\power UnitFailure) \cross (\power UnitFailure)
+\end{circus}
+
+\begin{circus}
+  \circchannel\ pumps: (PumpIndex \fun InputPState) \cross VAction \\
+  \circchannelset\ Information ==  \\ \t1
+    \lchanset emergencystop, cfailures, levelabovemax, levelbelowmin, levelokay, \\ \t2
+              nonqfailure, physicalunitsready, qfailure, sbwaiting, vzero \rchanset
+\end{circus}
+
+\begin{circus}
+   \circprocess\ Analyser \circdef\ \circbegin \\
+\end{circus}
+    % state variable lists == 
+    % expectedp, expectedpc
+    % failures, failureacks
+    % noacks 
+    % pumpctr, pa_1, pa_2, pst, pcst
+    % pumpState, pumpCtrState
+    % qa_1, qa_2, qst, qc_1, qc_2, q
+    % repairs
+    % stops, signalhistory, signals
+    % v
+    % va_1, va_2, vst, 
+    % valve, vc_1, vc_2,
+    % QSensor VSensor PumpCtrSystem Valve CValues ExpectedPumpStates Failures InputMsg 
+    % emergencyCond stores the information about if repairs? and failureacks? are expected or not. It is determined in the beginning of cycle
+\begin{circusaction}
+   \t1 \circstate\ AnalyserState == [~ Equipment0; Failures; InputMsg; \\ 
+       \t2 stops: NUMS; signalhistory: \power InputSignal; EmergenyCond ~] \\
+\end{circusaction}
+    % variable list for SetPumpCtr \land PumpOp
+    % qa_1, qa_2, qst, 
+    % va_1, va_2, vst,
+    % valve,
+    % qc_1, qc_2, vc_1, vc_2,
+    % pumpctr, pa_1, pa_2 
+    % failures, noacks 
+    % pst, pcst
+    % expectedp, expectedpc
+    % pumpState?, pumpCtrState? 
+\begin{zed}
+    \t1 StopSignalHis == [~ stops: NUMS; signalhistory: \power InputSignal ~] \\ % rye
+    \t1 PumpOp == \Xi QSensor \land \Xi VSensor \land \Xi Valve \land \Xi CValues \land \\
+        \t2 \Xi Failures \land \Xi ExpectedPumpStates \land \Xi InputMsg \land \\
+        \t2 \Xi StopSignalHis \land \Xi EmergenyCond \\ % rye: EquipmentFailures also includes the PumpCtrSystem, so it is not right for SetPumpCtr to update pumpctr etc since it is \Xi before EquipmentFailures. So just include failures
+\end{zed}
+    %\t1 PumpOp == \\ \t2 \Xi QSensor \land \Xi VSensor \land \Xi Valve \land \Xi CValues \land \Xi EquipmentFailures \land \Xi InputMsg \land \Xi StopSignalHis \\
+    %\t1 PumpOp == \\ \t2 \Xi QSensor \land \Xi VSensor \land \Xi Valve \land \Xi CValues \land \Xi EquipmentFailures \\
+    %\t1 InitAnalyserState == [~ AnalyserState~' | InitEquipment \land stops' = 0 \land signalhistory' = \emptyset ~] \\
+    % rye: add initialisation for InputMsg
+For $InputMsg$, its initial value can be arbitrarily chosen and it will not have impacts on the behaviour of the program. To ease model checking, we set a specific initial value in $InitAnalyserState$.
+\begin{zed}
+    \t1 InitAnalyserState == [~ AnalyserState~' | \\
+        \t2 InitEquipment \land stops' = 0 \land signalhistory' = \emptyset \land \\
+        % \t2 \theta InputMsg~' = \lblot signals == \emptyset[InputSignal], pumpState == \{ 1 \mapsto pclosed, 2 \mapsto pclosed, 3 \mapsto pclosed, 4 \mapsto pclosed\}, pumpCtrState == \{1 \mapsto pcnoflow, 2 \mapsto pcnoflow, 3 \mapsto pcnoflow, 4 \mapsto pcnoflow\}, q == 0, v == 0, failureacks == \emptyset[UnitFailure], repairs == \emptyset[UnitFailure] \rblot ~] \\ % explicit binding construct is not supported in ZRM
+        \t2 \theta InputMsg~' = (\LET signals == \emptyset[InputSignal]; \\
+            \t3 pumpState == \\
+                \t4 \{ 1 \mapsto pclosed, 2 \mapsto pclosed, 3 \mapsto pclosed, 4 \mapsto pclosed\}; \\
+            \t3 pumpCtrState == \\
+                \t4 \{1 \mapsto pcnoflow, 2 \mapsto pcnoflow, 3 \mapsto pcnoflow, 4 \mapsto pcnoflow\}; \\
+            \t3 q == 0; v == 0; failureacks == \emptyset[UnitFailure]; \\
+            \t3 repairs == \emptyset[UnitFailure] @ \\
+            \t3 \theta InputMsg) \\
+        \t2 \land emergencyCond' = 0 ~] \\
+        %
+\end{zed}
+\begin{zed}
+    \t1 Analyse == \\
+        \t2 [~ \Delta AnalyserState; InputMsg~? | \theta InputMsg~' = \theta InputMsg~? \land \\
+        \t2 CheckAndAdjustQ \land CheckAndAdjustV \land AdjustStops \land \\
+        \t2 signalhistory' = signalhistory \cup signals? \land \\
+        \t2 UpdateFailuresAck \land 
+        %\t2 AcceptFailureAcks \land AcceptRepairs \land \\
+        %\t2 AcceptRepairs \land SetPumpCtr \land AdjustStops \land \\
+        \Xi PumpCtrSystem \land \Xi ExpectedPumpStates \land \\ % rye: won't update PumpCtrSystem and ExpectedPumpStates
+        \t2 \Xi Valve \land Equipment~' \land \Xi EmergenyCond ~] \\
+\end{zed}
+In its predicate, $N\_1 < qa\_2$ should be $N\_2 < qa\_2$.
+\begin{zed}
+    \t1 DangerZone == [~ AnalyserState | qa\_1 \geq M\_1 \land qa\_2 \leq M\_2 \\
+        \t2 \implies qa\_1 < N\_1 \land N\_2 < qa\_2 ~] \\ %rye: should be N\_2 < qa_2
+    % \not (qa_1 >= M_1 \land qa_2 <= M_2) \lor (qa_1 < N_1 \land N_2 < qa_2)
+\end{zed}
+Instead of checking $\lnot RepairsExpected \lor \lnot FailuresExpected$, we check $emergencyCond$, because in the later stage, the $failures$ and $noacks$ have been updated and not original values. Therefore, it is wrong to check $repairs?$ and $failureacks?$ against updated $failures$ and $noacks$.
+\begin{zed}
+    \t1 EmergencyStopCond ==  [~ AnalyserState | \\
+        %\t2 [~ AnalyserState | stops \geq 3 \lor DangerZone \lor \lnot RepairsExpected \lor \\
+        %    \t2 \lnot FailuresExpected \lor transmissionFailure \in signals ~] \\
+            \t2 stops \geq 3 \lor DangerZone \lor emergencyCond = 1 \lor \\
+            \t2 transmissionFailure \in signals ~] \\
+\end{zed}
+\begin{zed}
+    \t1 LevelBelowMin == [~ AnalyserState | M\_1 \leq qa\_1 < N\_1 \land qa\_2 \leq N\_2 ~] \\
+    \t1 LevelAboveMax == [~ AnalyserState | N\_1 \leq qa\_1 \land N\_2 < qa\_2 \leq M\_2 ~] \\
+    \t1 LevelInRange == [~ AnalyserState | N\_1 \leq qa\_1 \land qa\_2 \leq N\_2 ~] \\
+    \t1 RateZero == [~ VSensor | va\_1 = 0 \land va\_2 = 0 ~] \\
+    \t1 AllPhysicalUnitsOkay == \\
+        \t2 [~ AnalyserState | \lnot QFailed \land \lnot VFailed \land \lnot PFailed \land \lnot PCFailed ~] \\
+    \t1 OtherPhysicalUnitsFail == \lnot QFailed \land \lnot AllPhysicalUnitsOkay \\
+    \t1 SteamBoilerWaiting == \\
+        \t2 [~ AnalyserState | steamBoilerWaiting \in signalhistory ~] \\
+    \t1 PhysicalUnitsReady == \\
+        \t2 [~ AnalyserState | physicalUnitsReady \in signalhistory ~] \\
+\end{zed}
+
+$HandleRepair$, as a schema expression, is added to repair equipments.
+\begin{zed}
+    \t1 HandleRepair == RepairEquipments \land EvalRepairFailureAck \land \Xi CValues \\
+        \t2 \land \Xi Failures \land \Xi InputMsg \land \Xi StopSignalHis \land \\
+        \t2 \Xi Valve \land \Xi ExpectedPumpStates \\
+    %\t1 HandleRepair == RepairEquipments \land EvalRepairFailureAck \\
+    %\t1 AnalyserCycle \circdef startcycle \then input~?msg \then (\lschexpract SetPumpCtr \land PumpOp \rschexpract \circseq \\
+    %\t1 AnalyserCycle \circdef startcycle \then input~?signals?pumpState?pumpCtrState?q?v?failureacks?repairs \then (\lschexpract SetPumpCtr \land PumpOp \rschexpract \circseq \\
+\end{zed}
+
+%$PumpOp$ is not necessary because the schema expression as action in \Circus\ implies the variables not in the frame are not changed.
+\begin{circusaction}
+    \t1 AnalyserCycle \circdef startcycle \then input1?signals \then input2?pumpState \then \\
+        \t2 input3?pumpCtrState \then input4?q \then input5?v \then \\
+        \t2 input6?failureacks \then input7?repairs \then \\
+%        \t2 (\lschexpract HandleRepair \rschexpract \circseq \lschexpract SetPumpCtr \rschexpract \circseq \\
+        \t2 (\lschexpract HandleRepair \rschexpract \circseq \lschexpract SetPumpCtr \land PumpOp \rschexpract \circseq \\
+            \t3 \lschexpract Analyse \rschexpract \circseq\ startexec \then InfoService) \\
+    %
+\end{circusaction}
+\begin{zed}
+    \t1 PumpOp2 == \Xi QSensor \land \Xi VSensor \land \Xi CValues \land \\
+        \t2 \Xi Failures \land \Xi InputMsg \land \Xi StopSignalHis \land \\
+        \t2 \Xi EmergenyCond \\ % rye: EquipmentFailures also includes the PumpCtrSystem, so it is not right for SetPumpCtr to update pumpctr etc since it is \Xi before EquipmentFailures. So just include failures
+    \t1 SetExpectedPumpState == \\
+        \t2 CalcExpectedPumpState \land SetValveState \land PumpOp2 \\ %rye: add for updating expected pump state
+%    \t1 SetExpectedPumpState == CalcExpectedPumpState \land SetValveState \\
+\end{zed}
+\begin{circusaction}
+    %\t1 SetValveStateOp == SetValveState \land \Xi QSensor \land \Xi VSensor \land \Xi CValues \land \Xi Failures \land \Xi PumpCtrSystem \land \Xi InputMsg \land \Xi StopSignalHis \land \Xi ExpectedPumpStates \\
+    \t1 InfoService \circdef (OfferInformation \circseq\ InfoService) \extchoice \\
+            \t2 failuresrepairs~!noacks!repairs \then pumps~?pumpstate?vstate \then \\
+            \t2 \lschexpract SetExpectedPumpState \rschexpract \circseq AnalyserCycle \\ %rye
+            %\t2 pumpState := pumpstate \circseq AnalyserCycle \\
+    \t1 OfferInformation \circdef \\
+            \t2 emergencystop.EmergencyStopCond \then \Skip \\ \t2 \extchoice \\ %
+            \t2 sbwaiting.SteamBoilerWaiting \then \Skip \\ \t2 \extchoice \\
+            \t2 vzero.RateZero \then \Skip \\ \t2 \extchoice \\ %
+            \t2 \lcircguard LevelBelowMin \rcircguard \circguard\ levelbelowmin \then \Skip \\ \t2 \extchoice \\
+            \t2 \lcircguard LevelAboveMax \rcircguard \circguard\ levelabovemax \then \Skip \\ \t2 \extchoice \\ %
+            \t2 levelokay.LevelInRange \then \Skip \\ \t2 \extchoice \\ %
+            \t2 physicalunitsready.PhysicalUnitsReady \then \Skip \\ \t2 \extchoice  \\ %
+            \t2 cfailures.(\lnot AllPhysicalUnitsOkay) \then \Skip \\ \t2 \extchoice \\
+            \t2 qfailure.QFailed \then \Skip \\ \t2 \extchoice \\ %
+            \t2 nonqfailure.OtherPhysicalUnitsFail \then \Skip \\
+\end{circusaction}
+\begin{circusaction}
+    \t1 \circspot \lschexpract InitAnalyserState \rschexpract \circseq\ AnalyserCycle \\
+\end{circusaction}
+\begin{circus}
+    \circend
+\end{circus}
+
+\begin{circus}
+    \circchannelset\ TAnalyserInterface == \lchanset startcycle \rchanset \\
+    \circprocess\ TAnalyser \circdef \\
+        \t1 Timer \lpar TAnalyserInterface \rpar Analyser \circhide TAnalyserInterface
+\end{circus}
+
+%\begin{circus}
+%   TSAnalyserDeadlockFreedom\ \circassertref\ DF \circrefines\ FLDV~ TAnalyser \\
+%   TSAnalyserLivelockFreedom\ \circassertref\ LF \circrefines\ FLDV~ TAnalyser \\
+%\end{circus}
+
+%\[
+%  \mathbf{assert}\ \mathsl{TAnalyser} :[ \hbox{ deadlock free } [FD] ] %
+%  \also %
+%  \mathbf{assert}\ \mathsl{TAnalyser} :[ \hbox{ livelock free } [FD] ]
+%\]
+
+\chapter{The $\mathsl{Controller}$}
+
+\begin{zed}
+  Mode ::= initialisation | normal | degraded | rescue | emergencyStop \\
+  Nonemergency == \{ initialisation, normal, degraded, rescue \}
+\end{zed}
+
+\begin{circus}
+    \circchannel\ startpumps, stoppumps, openvalve, closevalve, sendprogready \\
+    %
+    \circchannel\ reportmode: Mode \\
+    \circchannel\ startreport, endreport \\
+    \circchannelset\ Reports == \\
+        \t1 \lchanset startpumps, stoppumps, openvalve, closevalve, sendprogready \rchanset \\
+    \circchannelset\ TAControllerInterface ==  \lchanset startexec \rchanset \cup Information
+\end{circus}
+
+%\section{Initialisation mode}
+%\section{Normal mode}
+%\section{Degraded mode}
+%\section{Rescue mode}
+%
+%\section{Actions}
+%
+\section{The formal paragraphs}
+
+\begin{circus}
+    \circprocess\ Controller \circdef \circbegin \\
+\end{circus}
+\begin{circusaction}
+        \t1 \circstate\ ModeState == [~ mode: Mode ~] \\
+        \t1 InitController == [~ ModeState~' | mode' = initialisation ~] \\
+        \t1 EnterMode \circdef m: Mode \circspot reportmode~!m \then mode := m \\
+\end{circusaction}
+In $emergencyStop$ mode, it is not necessary to adjust level $AdjustLevel$ and just end report by $endreport$.
+\begin{circusaction}
+        \t1 ControllerCycle \circdef startexec \then startreport \then NewModeAnalysis \circseq\ \\
+                % adjust level should only happen when mode is not equal to emergency
+                \t2 (\lcircguard mode \neq emergencyStop \rcircguard \circguard AdjustLevel \extchoice \\
+                \t2 \lcircguard mode = emergencyStop \rcircguard \circguard Skip) \circseq \\
+                \t2 endreport \then ControllerCycle \\
+        \t1 NewModeAnalysis \circdef emergencystop.\true \then EnterMode~(emergencyStop) \\
+            \t2 \extchoice 
+            emergencystop.\false \then ( \\
+                \t3 \lcircguard mode = initialisation \rcircguard \circguard\ InitModeAnalysis \\
+                \t3 \extchoice \lcircguard mode = normal \rcircguard \circguard\ NormalModeAnalysis \\
+                \t3 \extchoice \lcircguard mode = degraded \rcircguard \circguard\ DegradedModeAnalysis \\
+                \t3 \extchoice \lcircguard mode = rescue \rcircguard \circguard\ RescueModeAnalysis \\
+                \t3 \extchoice \lcircguard (mode \notin Mode \setminus \{ emergencyStop \}) \rcircguard \circguard\ \Skip \\
+                \t2 ) \\
+                %\t3 \circif\ \ mode = initialisation \circthen InitModeAnalysis \\ %
+                %\t3\ \ \circelse\ mode = normal \circthen NormalModeAnalysis \\
+                %\t3\ \ \circelse\ mode = degraded \circthen DegradedModeAnalysis \\
+                %\t3\ \ \circelse\ mode = rescue \circthen RescueModeAnalysis \\
+                %\t3\ \ \circelse\ (mode \notin Mode \setminus \{ emergencyStop \}) \circthen \Skip \\
+                %\t3 \circfi \\
+            %\t2 \circseq AdjustLevel \\
+\end{circusaction}
+\begin{circusaction}
+        \t1 InitModeAnalysis \circdef \\ 
+            \t2 sbwaiting.\true \then \\
+                \t3 (~ vzero.\true \then \\
+                    \t4 (~ qfailure.\false \then \\
+                        \t5 (~ physicalunitsready.\true \then \\
+                                \t6 (~ levelokay.\true \then \\
+                                    \t7 (~ cfailures.\false \then EnterMode~(normal) \extchoice \\
+                                    \t7 cfailures.\true \then EnterMode~(degraded)~) \extchoice \\
+                                 \t6  levelokay.\false \then EnterMode~(emergencyStop)~) \extchoice \\
+                        \t5 physicalunitsready.\false \then \\
+                                \t6 (~ levelokay.\true \then \\
+                                    \t7 sendprogready \then \Skip \extchoice \\
+                                \t6 levelokay.\false \then \Skip~) ~) \extchoice \\
+                     \t4 qfailure.\true \then EnterMode~(emergencyStop)~) \extchoice \\
+                \t3 vzero.\false \then EnterMode~(emergencyStop)~) \extchoice\\
+            \t2 sbwaiting.\false \then \Skip \\
+        \t1 NormalModeAnalysis \circdef \\
+            \t2 cfailures.\false \then \Skip \extchoice \\
+            \t2 qfailure.\true \then EnterMode~(rescue) \extchoice \\
+            \t2 nonqfailure.\true \then EnterMode~(degraded) \\
+        \t1 DegradedModeAnalysis \circdef \\
+            \t2 qfailure.\false \then \\
+                \t3 ( cfailures.\true \then \Skip \extchoice \\
+                \t3 cfailures.\false \then EnterMode~(normal) ~) \\
+            \t2 \extchoice qfailure.\true \then EnterMode~(rescue) \\
+        \t1 RescueModeAnalysis \circdef \\
+            \t2 qfailure.\true \then \Skip \extchoice \\
+            \t2 qfailure.\false \then ( \\
+                \t3 cfailures.\false \then EnterMode~(normal) \\
+                \t3 \extchoice cfailures.\true \then EnterMode~(degraded)~) \\
+\end{circusaction}
+\begin{circusaction}
+        \t1 AdjustLevel \circdef  levelbelowmin \then RaiseLevel \extchoice \\ %
+            \t2 levelabovemax \then ReduceLevel \extchoice  \\ %
+            \t2 levelokay.\true \then RetainLevel \\
+        \t1 RaiseLevel \circdef StartPumps \circseq\ \\
+            \t2 \circif mode = initialisation \circthen CloseValve \\
+            \t2 \circelse mode \neq initialisation \circthen \Skip \\
+            \t2 \circfi  \\
+        \t1 ReduceLevel \circdef StopPumps \circseq\ \\
+            \t2 \circif mode = initialisation \circthen OpenValve \\
+            \t2\ \ \circelse mode \neq initialisation \circthen \Skip \\
+            \t2 \circfi  \\
+        \t1 RetainLevel \circdef StopPumps \circseq\ \\
+            \t2 \circif mode = initialisation \circthen CloseValve \\
+            \t2\ \ \circelse mode \neq initialisation \circthen \Skip \\
+            \t2 \circfi  \\
+        \t1 StartPumps \circdef startpumps \then \Skip        \\ %
+        \t1 StopPumps \circdef stoppumps \then \Skip         \\ %
+        \t1 OpenValve \circdef openvalve \then \Skip         \\ %
+        \t1 CloseValve \circdef closevalve \then \Skip \\
+\end{circusaction}
+\begin{circusaction}
+        %\t1 \circspot mode := initialisation \circseq ControllerCycle \\
+        \t1 \circspot \lschexpract InitController \rschexpract \circseq ControllerCycle \\
+\end{circusaction}
+\begin{circus}
+    \circend
+\end{circus}
+
+\begin{circus}
+   \circprocess\ TAController \circdef \\
+    \t1 (TAnalyser \lpar TAControllerInterface \rpar Controller) \circhide TAControllerInterface
+\end{circus}
+
+% assert Controller :[ deadlock free [FD] ]
+% assert Controller :[ livelock free [FD] ]
+
+\chapter{The $\mathsl{Reporter}$}
+
+\begin{zed}
+  OutputSignal ::= programReady  | openValve | closeValve | \\
+      \t1 levelFailureDetection | steamFailureDetection | \\
+      \t1 levelRepairedAcknowledgement | steamRepairedAcknowledgement
+\end{zed}
+
+\begin{schema}{OutputMsg}
+  mode: Mode
+  \\ %
+  signals: \power OutputSignal
+  \\ %
+  pumpState: PumpIndex \fun InputPState
+  \\ %
+  pumpFailureDetection: \power UnitFailure 
+  \\ %
+  pumpCtrFailureDetection: \power UnitFailure 
+  \\ %
+  pumpRepairedAcknowledgement: \power UnitFailure 
+  \\ %
+  pumpCtrRepairedAcknowledgement: \power UnitFailure 
+\end{schema}
+
+Similar to the $input$ channel, the $output$ channel is split too.
+\begin{circus}
+  % \circchannel\ output: OutputMsg % 
+
+  % rye: rewrite output channel definition
+%  \circchannel\ output: Mode \cross % mode 
+%                    (\power OutputSignal) \cross %signals
+%                    (PumpIndex \fun InputPState) \cross % pumpState
+%                    (\power UnitFailure) \cross % pumpFailureDetection: 
+%                    (\power UnitFailure) \cross % pumpCtrFailureDetection: 
+%                    (\power UnitFailure) \cross %pumpRepairedAcknowledgement:  
+%                    (\power UnitFailure) %pumpCtrRepairedAcknowledgement:  
+%                    \\
+  \circchannel\ output1: Mode \\ % mode 
+  \circchannel\ output2: (\power OutputSignal) \\ %signals
+  \circchannel\ output3: (PumpIndex \fun InputPState) \\ % pumpState
+  \circchannel\ output4: (\power UnitFailure) \\ % pumpFailureDetection: 
+  \circchannel\ output5: (\power UnitFailure) \\ % pumpCtrFailureDetection: 
+  \circchannel\ output6: (\power UnitFailure) \\ %pumpRepairedAcknowledgement:  
+  \circchannel\ output7: (\power UnitFailure) %pumpCtrRepairedAcknowledgement:  
+                    \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ Reporter \circdef \circbegin \\
+\end{circus}
+\begin{circusaction}
+        \t1 \circstate\ ReporterState == [~ OutputMsg; valveSt: VAction | true ~] \\ % rye
+\end{circusaction}
+Similar to the $Timer$ process and initial value of $InputMsg$, we initialise $OutputMsg$ as well though its initial value can be arbitrarily chosen.
+\begin{zed}
+        \t1 InitReporter == [~ ReporterState~' | valveSt' = VNoChange \land \\
+            \t2 \theta OutputMsg~' = \\
+            \t2 (\LET mode == initialisation; 
+                signals == \emptyset[OutputSignal]; \\
+                \t3 pumpState == \{ 1 \mapsto pclosed, 2 \mapsto pclosed, \\
+                    \t4 3 \mapsto pclosed, 4 \mapsto pclosed\}; \\
+                \t3 pumpFailureDetection == \emptyset[UnitFailure]; \\
+                \t3 pumpCtrFailureDetection == \emptyset[UnitFailure]; \\
+                \t3 pumpRepairedAcknowledgement == \emptyset[UnitFailure]; \\
+                \t3 pumpCtrRepairedAcknowledgement == \emptyset[UnitFailure] \\
+                \t3 @ \theta OutputMsg) ~] \\ % rye
+\end{zed}
+\begin{circusaction}
+        \t1 ReportService \circdef GatherReports \circseq ReportService \extchoice \\ %
+            % after entering emergencyStop mode, Reporter will not accept any other adjust and just endreport
+            \t2 reportmode.emergencyStop \then mode := emergencyStop \circseq TidyUp \extchoice \\%
+            \t2 TidyUp \\
+\end{circusaction}
+        % rye
+        % qfail/vfail in noacks? => levelFailureDetection/steamFailureDetection in signal'
+        % qfail/vfail in repairs? => levelRepairedAcknowledgement/steamRepairedAcknowledgement in signal'
+        % pfail(n) in noacks? => pfail(n) in pumpFailureDetection'
+        % pcfail(n) in noacks? => pcfail(n) in pumpCtrFailureDetection'
+        % pfail(n) in repairs? => pfail(n) in pumpRepairedAcknowledgement'
+        % pcfail(n) in repairs? => pcfail(n) in pumpCtrRepairedAcknowledgement'
+This schema is used to update $OutputMsg$ according to the inputs $noacks$ and $repairs$ from the $Analyser$ process.
+\begin{zed}
+        \t1 FailuresRepairs == [~ \Delta ReporterState; noacks?: (\power UnitFailure); \\
+            \t2 repairs?: (\power UnitFailure) | \\
+             \t2   (signals' = signals \cup \\
+                \t3 (\IF (qfail \in noacks?) \THEN \{ levelFailureDetection \} \ELSE \emptyset) \cup \\
+                \t3 (\IF vfail \in noacks? \THEN \{ steamFailureDetection \} \ELSE \emptyset) \cup \\
+                \t3 (\IF qfail \in repairs? \THEN \{ levelRepairedAcknowledgement \} \\
+                    \t4 \ELSE \emptyset) \cup \\
+                \t3 (\IF vfail \in repairs? \THEN \{ steamRepairedAcknowledgement \} \\
+                    \t4 \ELSE \emptyset)) \land \\
+             \t2   pumpFailureDetection' = \\
+                \t3 noacks? \cap \{ i:PumpIndex @ pfail~i \} \land \\
+             \t2   pumpCtrFailureDetection' = \\
+                \t3 noacks? \cap \{ i:PumpIndex @ pcfail~i \} \land \\
+             \t2   pumpRepairedAcknowledgement' = \\
+                \t3 repairs? \cap \{ i:PumpIndex @ pfail~i \} \land \\
+             \t2   pumpCtrRepairedAcknowledgement' = \\
+                \t3 repairs? \cap \{ i:PumpIndex @ pcfail~i \} \land \\
+             \t2   mode' = mode \land valveSt' = valveSt \land pumpState' = pumpState
+            ~] \\
+\end{zed}
+\begin{circusaction}
+        \t1 TidyUp \circdef endreport \then failuresrepairs~?noacks?repairs \then \lschexpract FailuresRepairs \rschexpract \circseq \\
+            %\t3 output~!( \theta OutputMsg ) \then \\
+            %rye
+            % \t3 output~!mode!signals!pumpState!pumpFailureDetection!pumpCtrFailureDetection!pumpRepairedAcknowledgement!pumpCtrRepairedAcknowledgement \then \\
+            \t2 output1!mode \then output2!signals \then output3!pumpState \then \\
+            \t2 output4!pumpFailureDetection \then output5!pumpCtrFailureDetection \then \\
+            \t2 output6!pumpRepairedAcknowledgement \then \\
+            \t2 output7!pumpCtrRepairedAcknowledgement \then \\
+            % \t3 pumps~!pumpState \then Reporter \\
+            \t2 pumps~!pumpState!valveSt \then \Skip \\ % change to Skip since \circmu X is added in its main action
+%        \t1 ALTERNATIVE\_TidyUp \circdef endreport \then \\
+%            \t3 (\circvar\ nopairsX, repairsX: \power UnitFailure \circspot \\
+%                \t4 failuresrepairs~?x \prefixcolon (x = (nopairsX, repairsX)) \then \\
+%                \t4 \lschexpract FailuresRepairs[nopairsX/nopairs, repairsX/repairs] \rschexpract ) \circseq \\
+%            \t3 output~!( \theta OutputMsg ) \then \\
+%            \t3 pumps~!pumpState \then Reporter \\
+        \t1 GatherReports \circdef \Extchoice m: Nonemergency \circspot reportmode.m \then mode := m
+                    \\ %
+                    \t3 \extchoice
+                    \\ %
+                    \t3 sendprogready \then signals := signals \cup \{ programReady \}
+                    \\ %
+                    \t3 \extchoice
+                    \\ %
+                    \t3 startpumps \then pumpState := PumpIndex \cross \{ popen \}
+                    \\ %
+                    \t3 \extchoice
+                    \\ %
+                    \t3 stoppumps \then pumpState := PumpIndex \cross \{ pclosed \}
+                    \\ %
+                    \t3 \extchoice
+                    \\ %
+                    \t3 openvalve \then signals, valveSt := signals \cup \{ openValve \}, openv 
+                    \\ %
+                    \t3 \extchoice
+                    \\ %
+                    \t3 closevalve \then signals, valveSt := signals \cup \{ closeValve \}, closev \\
+\end{circusaction}
+\begin{circusaction}
+        \t1 \circspot \circmu X \circspot startreport \then \lschexpract InitReporter \rschexpract \circseq ReportService \circseq X \\
+\end{circusaction}
+\begin{circus}
+        \circend
+\end{circus}
+
+\begin{circus}
+   %\circchannelset\ TACReporterInterface == Reports\ \cup \\
+   %     \t1 \lchanset startreport, reportmode, endreport, failuresrepairs, pumps \rchanset  \\
+
+   % rye: remove \cup operation in channelset to avoid timeout when calculating union_set in csp_sets.pl
+   \circchannelset\ TACReporterInterface == \\
+        \t1 \lchanset startpumps, stoppumps, openvalve, closevalve, sendprogready, \\
+            \t2 startreport, reportmode, endreport, failuresrepairs, pumps \rchanset  \\
+
+   \circprocess\ TACReporter \circdef \\
+    \t1 ( TAController \\
+        \t2 \lpar TACReporterInterface \rpar \\
+        \t1\ \ Reporter ) \circhide TACReporterInterface
+\end{circus}
+%\[
+%  \mathbf{assert}\ \mathsl{TACReporter} :[ \mathsl{deadlock free } [FD] ]
+%  \also %
+%  \mathbf{assert}\ \mathsl{TACReporter} :[ \mathsl{livelock free } [FD] ]
+%\]
+
+\chapter{Steam Boiler}
+\begin{circus}
+  \circprocess\ SteamBoiler \circdef TACReporter
+\end{circus}
+
+%\[
+%  \mathsl{SteamBoiler1} \refinedby_{FD} \mathsl{SteamBoiler}
+%\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\chapter{Analysis}
+
+%\begin{circus}
+%   \circprocess\ WaitForSBWaiting \circdef \circbegin \\
+%   \t1 \circspot \circmu X \circspot startexec \then \\
+%        \t2 startreport \then \\
+%            \t3 emergencystop.\false \then \\
+%                \t4 sbwaiting.\false \then \\
+%                    \t5 levelokay.\true \then \\
+%                        \t6 stoppumps \then \\
+%                            \t7 closevalve \then \\
+%                                \t8 endreport \then \\
+%                                    \t9 X \\
+%   \circend
+%\end{circus}
+%
+%\begin{circus}
+%   \circprocess\ Deadlock \circdef \circbegin \circspot \Stop \circend \\
+%   \circprocess\ ControllerStop \circdef \\
+%        \t1 Controller \\
+%% 22-Feb-2008: According to Ana, channel set expressions should not allow fields
+%%              so, for parsing purposes, I am just leaving all values anyway.
+%%            \t2 \lpar \lchanset levelabovemax, levelbelowmin, \\
+%%                            \t3  sbwaiting.\true, \\
+%%                            \t3  emergencystop.\true \rchanset \rpar \\
+%            \t2 \lpar \lchanset levelabovemax, levelbelowmin, \\
+%                            \t3  sbwaiting, \\
+%                            \t3  emergencystop \rchanset \rpar \\
+%        \t2 Deadlock %
+%\end{circus}
+%%
+%\[
+%  \mathbf{assert}\
+%  \begin{zedblock}
+%    ControllerStop
+%    \\ %
+%    \refinedby_{FD}
+%    \\ %
+%    \mathsl{WaitForSBWaiting}
+%  \end{zedblock}
+%  \also %
+%  \mathbf{assert}\
+%  \begin{zedblock}
+%    \mathsl{WaitForSBWaiting}
+%    \\ %
+%    \refinedby_{FD}
+%    \\ %
+%    ControllerStop
+%  \end{zedblock}
+%\]
+
+%\chapter{Properties to Check}
+% LTL on ProB
+%\begin{description}
+%    \item[P1] The signal $openValve$ and $closeValve$ shall not be sent to the physical units at the same time.
+%        \begin{itemize}
+%            \item ``not F {openValve: Reporter_signals & closeValve: Reporter_signals}'' - $openValve$ and $closeValve$ can not be set together
+%            \item ``not EX {openValve: Reporter_signals & closeValve: Reporter_signals}'' - $openValve$ and $closeValve$ can not be set together
+%            \item ``G (not e(output2.{openValve, closeValve}))'' - $openValve$ and $closeValve$ can not be set together
+%        \end{itemize}
+%\end{description}
+
+\bibliographystyle{splncs03}
+\bibliography{steam_boiler.bib}
+
+\end{document}

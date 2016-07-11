@@ -1,0 +1,413 @@
+-- This CSP specification is translated from a Circus program by Circus2ZCSP translator.
+
+-- Minimum and maximum integers for model checking. Make sure they are set in advance.
+MININT = 0
+MAXINT = 70
+
+-- Maximum instances generated for iseq.  Make sure it is set in advance.
+MAXINS = 3
+
+-- include a set of libraries
+include "lib_basic.csp"
+include "lib_num.csp"
+include "lib_card.csp"
+include "lib_log.csp"
+include "lib_set.csp"
+include "lib_rel.csp"
+include "lib_fun.csp"
+include "lib_seq.csp"
+
+
+-- Axiomatic definition (Constant)
+-- They should be assigned manually to meet its type and predicate restriction
+-- and match the values assigned in Z as well
+-- The variables defined below should meet the predicate below
+--       MAX_NUM == 70
+MAX_NUM = 70
+--       M_1 <= N_1 and N_1 <= N_2 and N_2 <= M_2 and M_1 == 7 and N_1 == 14 and N_2 == 56 and M_2 == 63
+M_1 = 7
+N_1 = 14
+N_2 = 56
+M_2 = 63
+--       C == 70 and P == 1 and U_1 == 1 and U_2 == 1 and W == 10
+C = 70
+P = 1
+U_1 = 1
+U_2 = 1
+W = 10
+
+-- type
+PumpIndex = {1 .. 4}
+InputPState = {popen, pclosed}
+InputPCState = {pcflow, pcnoflow}
+NUMS = {0 .. MAX_NUM}
+Nonemergency = {initialisation, normal, degraded, rescue}
+Timer_Time = {0 .. Timer_cyclelimit}
+Timer_cyclelimit = Timer_cycletime - 1
+Timer_cycletime = 5
+Analyser_PumpCtr = {(Analyser_PumpCtr_rec_pa_1.pa_1, Analyser_PumpCtr_rec_pa_2.pa_2, Analyser_PumpCtr_rec_pcst.pcst, Analyser_PumpCtr_rec_pst.pst) | pa_1 <- {0, P}, pa_2 <- {0, P}, pcst <- PCState, pst <- PState, implies(pst == popen, pcst == pcflow or pcst == pcfailed) and true and implies(pst == popen, pa_1 == P and pa_2 == P) and pa_1 <= pa_2 and implies(pst == pwaiting or pst == pclosed, pa_1 == 0 and pa_2 == 0) and pa_1 <= pa_2 and implies(pst == pwaiting, pcst == pcnoflow or pcst == pcfailed) and true and implies(pst == popen, pa_1 == P and pa_2 == P) and pa_1 <= pa_2 and implies(pst == pwaiting or pst == pclosed, pa_1 == 0 and pa_2 == 0) and pa_1 <= pa_2 and implies(pst == pclosed, pcst == pcnoflow or pcst == pcfailed) and true and implies(pst == popen, pa_1 == P and pa_2 == P) and pa_1 <= pa_2 and implies(pst == pwaiting or pst == pclosed, pa_1 == 0 and pa_2 == 0) and pa_1 <= pa_2 and implies(pst == pfailed and pcst == pcflow, pa_1 == P and pa_2 == P) and true and implies(pst == popen, pa_1 == P and pa_2 == P) and pa_1 <= pa_2 and implies(pst == pwaiting or pst == pclosed, pa_1 == 0 and pa_2 == 0) and pa_1 <= pa_2 and implies(pst == pfailed and pcst == pcnoflow, pa_1 == 0 and pa_2 == 0) and true and implies(pst == popen, pa_1 == P and pa_2 == P) and pa_1 <= pa_2 and implies(pst == pwaiting or pst == pclosed, pa_1 == 0 and pa_2 == 0) and pa_1 <= pa_2 and implies(pst == pfailed and pcst == pcfailed, pa_1 == 0 and pa_2 == P) and true and implies(pst == popen, pa_1 == P and pa_2 == P) and pa_1 <= pa_2 and implies(pst == pwaiting or pst == pclosed, pa_1 == 0 and pa_2 == 0) and pa_1 <= pa_2}
+
+datatype InputSignal = stop | steamBoilerWaiting | physicalUnitsReady | transmissionFailure
+datatype PState = popen | pwaiting | pclosed | pfailed
+datatype PCState = pcflow | pcnoflow | pcfailed
+datatype UnitFailure = qfail | vfail | pfail.PumpIndex | pcfail.PumpIndex
+datatype VStateAct = openv | closev | VNoChange
+datatype SState = sokay | sfailed
+datatype Mode = initialisation | normal | degraded | rescue | emergencyStop
+datatype OutputSignal = programReady | openValve | closeValve | levelFailureDetection | steamFailureDetection | levelRepairedAcknowledgement | steamRepairedAcknowledgement
+datatype VState = vopen | vclosed
+datatype Analyser_PumpCtr_rec_field = Analyser_PumpCtr_rec_pa_1.{0, P} | Analyser_PumpCtr_rec_pa_2.{0, P} | Analyser_PumpCtr_rec_pcst.PCState | Analyser_PumpCtr_rec_pst.PState
+
+select_field_Analyser_PumpCtr((Analyser_PumpCtr_rec_pa_1.x, _, _, _), Analyser_PumpCtr_rec_pa_1) = x
+select_field_Analyser_PumpCtr((_, Analyser_PumpCtr_rec_pa_2.x, _, _), Analyser_PumpCtr_rec_pa_2) = x
+select_field_Analyser_PumpCtr((_, _, Analyser_PumpCtr_rec_pcst.x, _), Analyser_PumpCtr_rec_pcst) = x
+select_field_Analyser_PumpCtr((_, _, _, Analyser_PumpCtr_rec_pst.x), Analyser_PumpCtr_rec_pst) = x
+
+-- channel declarations
+channel div
+channel clocktick,startcycle
+channel Timer_InitTimer
+channel Timer_AssgnOp1
+channel levelbelowmin,levelabovemax
+channel emergencystop,cfailures,levelokay,nonqfailure : Bool
+channel physicalunitsready,qfailure,sbwaiting,vzero : Bool
+channel input1 : Set(InputSignal)
+channel input2 : tfun(PumpIndex, InputPState)
+channel input3 : tfun(PumpIndex, InputPCState)
+channel input4 : NUMS
+channel input5 : NUMS
+channel input6 : Set(UnitFailure)
+channel input7 : Set(UnitFailure)
+channel startexec
+channel failuresrepairs : Set(UnitFailure).Set(UnitFailure)
+channel pumps : tfun(PumpIndex, InputPState).VStateAct
+channel Analyser_InitAnalyserState
+channel Analyser_HandleRepair: Set(UnitFailure)
+channel Analyser_HandleRepair_fOp: Set(UnitFailure)
+channel SchExpr_2: tfun(PumpIndex, InputPCState).tfun(PumpIndex, InputPState)
+channel SchExpr_2_fOp: tfun(PumpIndex, InputPCState).tfun(PumpIndex, InputPState)
+channel Analyser_Analyse: Set(UnitFailure).tfun(PumpIndex, InputPCState).tfun(PumpIndex, InputPState).NUMS.Set(UnitFailure).Set(InputSignal).NUMS
+channel Analyser_Analyse_fOp: Set(UnitFailure).tfun(PumpIndex, InputPCState).tfun(PumpIndex, InputPState).NUMS.Set(UnitFailure).Set(InputSignal).NUMS
+channel Analyser_SetExpectedPumpState: tfun(PumpIndex, InputPState).VStateAct
+channel Analyser_SetExpectedPumpState_fOp: tfun(PumpIndex, InputPState).VStateAct
+channel startpumps,stoppumps,openvalve,closevalve,sendprogready
+channel reportmode : Mode
+channel startreport,endreport
+channel Controller_InitController
+channel Controller_AssgnOp3
+channel Controller_AssgnOp4
+channel Controller_AssgnOp5
+channel Controller_AssgnOp6
+channel Controller_AssgnOp7
+channel Controller_AssgnOp8
+channel Controller_AssgnOp9
+channel Controller_AssgnOp10
+channel Controller_AssgnOp11
+channel Controller_AssgnOp12
+channel Controller_AssgnOp13
+channel Controller_AssgnOp14
+channel output1 : Mode
+channel output2 : Set(OutputSignal)
+channel output3 : tfun(PumpIndex, InputPState)
+channel output4 : Set(UnitFailure)
+channel output5 : Set(UnitFailure)
+channel output6 : Set(UnitFailure)
+channel output7 : Set(UnitFailure)
+channel Reporter_InitReporter
+channel Reporter_AssgnOp15
+channel Reporter_AssgnOp16: Nonemergency
+channel Reporter_AssgnOp17
+channel Reporter_AssgnOp18
+channel Reporter_AssgnOp19
+channel Reporter_AssgnOp20
+channel Reporter_AssgnOp21
+channel Reporter_AssgnOp22
+channel Reporter_FailuresRepairs: Set(UnitFailure).Set(UnitFailure)
+channel Reporter_FailuresRepairs_fOp: Set(UnitFailure).Set(UnitFailure)
+channel Timer_OP_time : Timer_Time
+channel Analyser_OP_pumpCtrState : tfun(PumpIndex, InputPCState)
+channel Analyser_OP_signalhistory : Set(InputSignal)
+channel Analyser_OP_vst : SState
+channel Analyser_OP_pta_2 : {0, P, 2 * P, 3 * P, 4 * P}
+channel Analyser_OP_pta_1 : {0, P, 2 * P, 3 * P, 4 * P}
+channel Analyser_OP_repairs : Set(UnitFailure)
+channel Analyser_OP_failureacks : Set(UnitFailure)
+channel Analyser_OP_valve : VState
+channel Analyser_OP_qc_2 : NUMS
+channel Analyser_OP_expectedp : tfun(PumpIndex, InputPState)
+channel Analyser_OP_q : NUMS
+channel Analyser_OP_va_1 : NUMS
+channel Analyser_OP_va_2 : NUMS
+channel Analyser_OP_expectedpc : tfun(PumpIndex, InputPCState)
+channel Analyser_OP_signals : Set(InputSignal)
+channel Analyser_OP_qa_2 : NUMS
+channel Analyser_OP_failures : Set(UnitFailure)
+channel Analyser_OP_vc_1 : NUMS
+channel Analyser_OP_v : NUMS
+channel Analyser_OP_noacks : Set(UnitFailure)
+channel Analyser_OP_qc_1 : NUMS
+channel Analyser_OP_vc_2 : NUMS
+channel Analyser_OP_qa_1 : NUMS
+channel Analyser_OP_qst : SState
+channel Analyser_OP_pumpctr : tfun(PumpIndex, Analyser_PumpCtr)
+channel Analyser_OP_pumpState : tfun(PumpIndex, InputPState)
+channel Analyser_OP_stops : NUMS
+channel Controller_OP_mode : Mode
+channel Reporter_OP_valveSt : VStateAct
+channel Reporter_OP_pumpState : tfun(PumpIndex, InputPState)
+channel Reporter_OP_mode : Mode
+channel Reporter_OP_signals : Set(OutputSignal)
+channel Reporter_OP_pumpCtrRepairedAcknowledgement : Set(UnitFailure)
+channel Reporter_OP_pumpRepairedAcknowledgement : Set(UnitFailure)
+channel Reporter_OP_pumpFailureDetection : Set(UnitFailure)
+channel Reporter_OP_pumpCtrFailureDetection : Set(UnitFailure)
+
+-- channel set declarations
+Information = {| emergencystop, cfailures, levelabovemax, levelbelowmin, levelokay, nonqfailure, physicalunitsready, qfailure, sbwaiting, vzero |}
+TAnalyserInterface = {| startcycle |}
+Reports = {| startpumps, stoppumps, openvalve, closevalve, sendprogready |}
+TAControllerInterface = union({| startexec |}, Information)
+TACReporterInterface = {| startpumps, stoppumps, openvalve, closevalve, sendprogready, startreport, reportmode, endreport, failuresrepairs, pumps |}
+
+-- hidden event
+HIDE_CSPB = {|Timer_OP_time, Analyser_OP_pumpCtrState, Analyser_OP_signalhistory, Analyser_OP_vst, Analyser_OP_pta_2, Analyser_OP_pta_1, Analyser_OP_repairs, Analyser_OP_failureacks, Analyser_OP_valve, Analyser_OP_qc_2, Analyser_OP_expectedp, Analyser_OP_q, Analyser_OP_va_1, Analyser_OP_va_2, Analyser_OP_expectedpc, Analyser_OP_signals, Analyser_OP_qa_2, Analyser_OP_failures, Analyser_OP_vc_1, Analyser_OP_v, Analyser_OP_noacks, Analyser_OP_qc_1, Analyser_OP_vc_2, Analyser_OP_qa_1, Analyser_OP_qst, Analyser_OP_pumpctr, Analyser_OP_pumpState, Analyser_OP_stops, Controller_OP_mode, Reporter_OP_valveSt, Reporter_OP_pumpState, Reporter_OP_mode, Reporter_OP_signals, Reporter_OP_pumpCtrRepairedAcknowledgement, Reporter_OP_pumpRepairedAcknowledgement, Reporter_OP_pumpFailureDetection, Reporter_OP_pumpCtrFailureDetection, Timer_InitTimer, Timer_AssgnOp1, Analyser_InitAnalyserState, Analyser_HandleRepair, Analyser_HandleRepair_fOp, SchExpr_2, SchExpr_2_fOp, Analyser_Analyse, Analyser_Analyse_fOp, Analyser_SetExpectedPumpState, Analyser_SetExpectedPumpState_fOp, Controller_InitController, Controller_AssgnOp3, Controller_AssgnOp4, Controller_AssgnOp5, Controller_AssgnOp6, Controller_AssgnOp7, Controller_AssgnOp8, Controller_AssgnOp9, Controller_AssgnOp10, Controller_AssgnOp11, Controller_AssgnOp12, Controller_AssgnOp13, Controller_AssgnOp14, Reporter_InitReporter, Reporter_AssgnOp15, Reporter_AssgnOp16, Reporter_AssgnOp17, Reporter_AssgnOp18, Reporter_AssgnOp19, Reporter_AssgnOp20, Reporter_AssgnOp21, Reporter_AssgnOp22, Reporter_FailuresRepairs, Reporter_FailuresRepairs_fOp|}
+
+-- processes for variable storing and retrieving 
+
+-- processes 
+-- Divergent Process 
+DIV = div -> STOP
+
+
+Timer = 
+   ((Timer_InitTimer ->  SKIP) ; 
+  let Timer_TCycle = 
+     ( ((Timer_AssgnOp1 ->  SKIP) ; Timer_OP_time?time -> 
+    (   (not (time == 0) and not (time != 0) & DIV)
+     [] 
+      (   (time == 0 and not (time != 0) & startcycle -> SKIP)
+       [] 
+        (   (time == 0 and time != 0 & 
+          (    startcycle -> SKIP
+           |~| SKIP
+          ))
+         [] (not (time == 0) and time != 0 & SKIP)
+        )
+      )
+    ))  ; clocktick -> Timer_TCycle) 
+  within Timer_TCycle) 
+
+Analyser = 
+   ((Analyser_InitAnalyserState ->  SKIP) ; 
+  let Analyser_AnalyserCycle = 
+    startcycle -> input1?signals -> input2?pumpState -> input3?pumpCtrState -> input4?q -> input5?v -> input6?failureacks -> input7?repairs ->  ( ( (
+    (   Analyser_HandleRepair!repairs ->  SKIP
+     [] Analyser_HandleRepair_fOp!repairs -> DIV
+    ) ; 
+    (   SchExpr_2!pumpCtrState!pumpState ->  SKIP
+     [] SchExpr_2_fOp!pumpCtrState!pumpState -> DIV
+    ))  ; 
+    (   Analyser_Analyse!failureacks!pumpCtrState!pumpState!q!repairs!signals!v ->  SKIP
+     [] Analyser_Analyse_fOp!failureacks!pumpCtrState!pumpState!q!repairs!signals!v -> DIV
+    ))  ; startexec -> 
+    let Analyser_InfoService = 
+      Analyser_OP_va_2?va_2 -> Analyser_OP_vst?vst -> Analyser_OP_va_1?va_1 -> Analyser_OP_failureacks?failureacks -> Analyser_OP_stops?stops -> Analyser_OP_noacks?noacks -> Analyser_OP_signals?signals -> Analyser_OP_failures?failures -> Analyser_OP_repairs?repairs -> Analyser_OP_qa_2?qa_2 -> Analyser_OP_signalhistory?signalhistory -> Analyser_OP_pumpctr?pumpctr -> Analyser_OP_qst?qst -> Analyser_OP_qa_1?qa_1 -> 
+      (    (
+        (   
+          (   
+            (   
+              (   
+                (   
+                  (   
+                    (   
+                      (   
+                        (   emergencystop.(stops >= 3 or implies(qa_1 >= M_1 and qa_2 <= M_2, qa_1 < N_1 and N_2 < qa_2) or not (repairs <= failures) or not (failureacks <= noacks) or member(transmissionFailure, signals)) -> SKIP
+                         [] sbwaiting.(member(steamBoilerWaiting, signalhistory)) -> SKIP
+                        )
+                       [] vzero.(va_1 == 0 and va_2 == 0) -> SKIP
+                      )
+                     [] (M_1 <= qa_1 and qa_1 < N_1 and qa_2 <= N_2 & levelbelowmin -> SKIP)
+                    )
+                   [] (N_1 <= qa_1 and N_2 < qa_2 and qa_2 <= M_2 & levelabovemax -> SKIP)
+                  )
+                 [] levelokay.(N_1 <= qa_1 and qa_2 <= N_2) -> SKIP
+                )
+               [] physicalunitsready.(member(physicalUnitsReady, signalhistory)) -> SKIP
+              )
+             [] cfailures.(not (not (qst == sfailed) and not (vst == sfailed) and not (exists(PumpIndex, (\ i @ select_field_Analyser_PumpCtr(fa(pumpctr, i), Analyser_PumpCtr_rec_pst) == pfailed))) and not (exists(PumpIndex, (\ i @ select_field_Analyser_PumpCtr(fa(pumpctr, i), Analyser_PumpCtr_rec_pcst) == pcfailed))))) -> SKIP
+            )
+           [] qfailure.(qst == sfailed) -> SKIP
+          )
+         [] nonqfailure.(not (qst == sfailed) and not (not (qst == sfailed) and not (vst == sfailed) and not (exists(PumpIndex, (\ i @ select_field_Analyser_PumpCtr(fa(pumpctr, i), Analyser_PumpCtr_rec_pst) == pfailed))) and not (exists(PumpIndex, (\ i @ select_field_Analyser_PumpCtr(fa(pumpctr, i), Analyser_PumpCtr_rec_pcst) == pcfailed))))) -> SKIP
+        ) ; Analyser_InfoService) 
+       []  (failuresrepairs.(noacks).(repairs) -> pumps?pumpstate?vstate -> 
+        (   Analyser_SetExpectedPumpState!pumpstate!vstate ->  SKIP
+         [] Analyser_SetExpectedPumpState_fOp!pumpstate!vstate -> DIV
+        ) ; Analyser_AnalyserCycle) 
+      )
+    within Analyser_InfoService) 
+  within Analyser_AnalyserCycle) 
+
+TAnalyser = Timer [| TAnalyserInterface |] Analyser \ TAnalyserInterface
+
+Controller = 
+   ((Controller_InitController ->  SKIP) ; 
+  let Controller_ControllerCycle = 
+     (startexec -> startreport -> 
+    (   emergencystop.(true) -> reportmode.(emergencyStop) -> (Controller_AssgnOp3 ->  SKIP)
+     []  (emergencystop.(false) -> Controller_OP_mode?mode -> 
+      (   
+        (   
+          (   
+            (   (mode == initialisation & 
+              (   sbwaiting.(true) -> 
+                (   vzero.(true) -> 
+                  (   qfailure.(false) -> 
+                    (   physicalunitsready.(true) -> 
+                      (   levelokay.(true) -> 
+                        (   cfailures.(false) -> reportmode.(normal) -> (Controller_AssgnOp4 ->  SKIP)
+                         [] cfailures.(true) -> reportmode.(degraded) -> (Controller_AssgnOp5 ->  SKIP)
+                        )
+                       [] levelokay.(false) -> reportmode.(emergencyStop) -> (Controller_AssgnOp6 ->  SKIP)
+                      )
+                     [] physicalunitsready.(false) -> 
+                      (   levelokay.(true) -> sendprogready -> SKIP
+                       [] levelokay.(false) -> SKIP
+                      )
+                    )
+                   [] qfailure.(true) -> reportmode.(emergencyStop) -> (Controller_AssgnOp7 ->  SKIP)
+                  )
+                 [] vzero.(false) -> reportmode.(emergencyStop) -> (Controller_AssgnOp8 ->  SKIP)
+                )
+               [] sbwaiting.(false) -> SKIP
+              ))
+             [] (mode == normal & 
+              (   
+                (   cfailures.(false) -> SKIP
+                 [] qfailure.(true) -> reportmode.(rescue) -> (Controller_AssgnOp9 ->  SKIP)
+                )
+               [] nonqfailure.(true) -> reportmode.(degraded) -> (Controller_AssgnOp10 ->  SKIP)
+              ))
+            )
+           [] (mode == degraded & 
+            (   qfailure.(false) -> 
+              (   cfailures.(true) -> SKIP
+               [] cfailures.(false) -> reportmode.(normal) -> (Controller_AssgnOp11 ->  SKIP)
+              )
+             [] qfailure.(true) -> reportmode.(rescue) -> (Controller_AssgnOp12 ->  SKIP)
+            ))
+          )
+         [] (mode == rescue & 
+          (   qfailure.(true) -> SKIP
+           [] qfailure.(false) -> 
+            (   cfailures.(false) -> reportmode.(normal) -> (Controller_AssgnOp13 ->  SKIP)
+             [] cfailures.(true) -> reportmode.(degraded) -> (Controller_AssgnOp14 ->  SKIP)
+            )
+          ))
+        )
+       [] (not member(mode, diff(Mode, {emergencyStop})) & SKIP)
+      ) ; 
+      (   
+        (   levelbelowmin ->  (startpumps -> SKIP ; Controller_OP_mode?mode -> 
+          (   (not (mode == initialisation) and not (mode != initialisation) & DIV)
+           [] 
+            (   (mode == initialisation and not (mode != initialisation) & closevalve -> SKIP)
+             [] 
+              (   (mode == initialisation and mode != initialisation & 
+                (    closevalve -> SKIP
+                 |~| SKIP
+                ))
+               [] (not (mode == initialisation) and mode != initialisation & SKIP)
+              )
+            )
+          )) 
+         [] levelabovemax ->  (stoppumps -> SKIP ; Controller_OP_mode?mode -> 
+          (   (not (mode == initialisation) and not (mode != initialisation) & DIV)
+           [] 
+            (   (mode == initialisation and not (mode != initialisation) & openvalve -> SKIP)
+             [] 
+              (   (mode == initialisation and mode != initialisation & 
+                (    openvalve -> SKIP
+                 |~| SKIP
+                ))
+               [] (not (mode == initialisation) and mode != initialisation & SKIP)
+              )
+            )
+          )) 
+        )
+       [] levelokay.(true) ->  (stoppumps -> SKIP ; Controller_OP_mode?mode -> 
+        (   (not (mode == initialisation) and not (mode != initialisation) & DIV)
+         [] 
+          (   (mode == initialisation and not (mode != initialisation) & closevalve -> SKIP)
+           [] 
+            (   (mode == initialisation and mode != initialisation & 
+              (    closevalve -> SKIP
+               |~| SKIP
+              ))
+             [] (not (mode == initialisation) and mode != initialisation & SKIP)
+            )
+          )
+        )) 
+      )) 
+    ) ; endreport -> Controller_ControllerCycle) 
+  within Controller_ControllerCycle) 
+
+TAController = TAnalyser [| TAControllerInterface |] Controller \ TAControllerInterface
+
+Reporter = 
+   ((Reporter_InitReporter ->  SKIP) ; 
+  let X = 
+     ( (startreport -> (Reporter_AssgnOp15 ->  SKIP) ; 
+    let Reporter_ReportService = 
+      (   
+        (    (( [] m:Nonemergency @ 
+          (   
+            (   
+              (   
+                (   
+                  (   reportmode.(m) -> (Reporter_AssgnOp16!m ->  SKIP)
+                   [] sendprogready -> (Reporter_AssgnOp17 ->  SKIP)
+                  )
+                 [] startpumps -> (Reporter_AssgnOp18 ->  SKIP)
+                )
+               [] stoppumps -> (Reporter_AssgnOp19 ->  SKIP)
+              )
+             [] openvalve -> (Reporter_AssgnOp20 ->  SKIP)
+            )
+           [] closevalve -> (Reporter_AssgnOp21 ->  SKIP)
+          )) ; Reporter_ReportService) 
+         []  (reportmode.(emergencyStop) -> (Reporter_AssgnOp22 ->  SKIP) ;  (endreport -> failuresrepairs?noacks?repairs -> 
+          (   Reporter_FailuresRepairs!noacks!repairs ->  SKIP
+           [] Reporter_FailuresRepairs_fOp!noacks!repairs -> DIV
+          ) ; Reporter_OP_mode?mode -> output1.(mode) -> Reporter_OP_signals?signals -> output2.(signals) -> Reporter_OP_pumpState?pumpState -> output3.(pumpState) -> Reporter_OP_pumpFailureDetection?pumpFailureDetection -> output4.(pumpFailureDetection) -> Reporter_OP_pumpCtrFailureDetection?pumpCtrFailureDetection -> output5.(pumpCtrFailureDetection) -> Reporter_OP_pumpRepairedAcknowledgement?pumpRepairedAcknowledgement -> output6.(pumpRepairedAcknowledgement) -> Reporter_OP_pumpCtrRepairedAcknowledgement?pumpCtrRepairedAcknowledgement -> output7.(pumpCtrRepairedAcknowledgement) -> Reporter_OP_valveSt?valveSt -> Reporter_OP_pumpState?pumpState -> pumps.(pumpState).(valveSt) -> SKIP) ) 
+        )
+       []  (endreport -> failuresrepairs?noacks?repairs -> 
+          (   Reporter_FailuresRepairs!noacks!repairs ->  SKIP
+           [] Reporter_FailuresRepairs_fOp!noacks!repairs -> DIV
+          ) ; Reporter_OP_mode?mode -> output1.(mode) -> Reporter_OP_signals?signals -> output2.(signals) -> Reporter_OP_pumpState?pumpState -> output3.(pumpState) -> Reporter_OP_pumpFailureDetection?pumpFailureDetection -> output4.(pumpFailureDetection) -> Reporter_OP_pumpCtrFailureDetection?pumpCtrFailureDetection -> output5.(pumpCtrFailureDetection) -> Reporter_OP_pumpRepairedAcknowledgement?pumpRepairedAcknowledgement -> output6.(pumpRepairedAcknowledgement) -> Reporter_OP_pumpCtrRepairedAcknowledgement?pumpCtrRepairedAcknowledgement -> output7.(pumpCtrRepairedAcknowledgement) -> Reporter_OP_valveSt?valveSt -> Reporter_OP_pumpState?pumpState -> pumps.(pumpState).(valveSt) -> SKIP) 
+      )
+    within Reporter_ReportService)  ; X) 
+  within X) 
+
+TACReporter = TAController [| TACReporterInterface |] Reporter \ TACReporterInterface
+
+SteamBoiler = TACReporter
+
+WaitForSBWaiting = 
+  let X = 
+    startexec -> startreport -> emergencystop.(false) -> sbwaiting.(false) -> levelokay.(true) -> stoppumps -> closevalve -> endreport -> X
+  within X
+
+Deadlock = 
+  STOP
+
+ControllerStop = Controller [| {| levelabovemax, levelbelowmin, sbwaiting, emergencystop |} |] Deadlock
+
+MAIN = SteamBoiler
+
+
+-- assertions 
+assert MAIN :[ livelock free ]
+assert MAIN :[ deadlock free [F] ]
+assert MAIN :[ deadlock free [FD] ]
+

@@ -1,0 +1,29 @@
+
+\begin{zsection}
+	\SECTION\ Cell \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	BIT == \{0, 1\} \\      % possible value of one bit
+\end{zed}
+
+\begin{circus}
+	\circchannel\ berase\\
+	\circchannel\ set\\
+\end{circus}
+
+\begin{circus}
+	\circprocess\ Cell \circdef \circbegin \\
+		\t1 \circstate\ CellState == [~ v: BIT | true ~] \\
+    	\t1	CellInit == [~ (CellState)' | v' = 0 ~] \\
+	\t1 \circspot \lschexpract CellInit \rschexpract \circseq (\circmu X \circspot (
+        (
+        % \Skip
+        % berase \then \Skip \circseq v':=0
+            set \then v:=0
+        %    \extchoice 
+        %    set \then v := 1
+        ) 
+        \circseq X)) \\
+	\circend
+\end{circus}

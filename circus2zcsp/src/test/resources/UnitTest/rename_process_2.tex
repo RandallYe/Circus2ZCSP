@@ -1,0 +1,27 @@
+\begin{zsection}
+  \SECTION\ indexed\_renaming\_2 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ c, d: T \\
+	\circchannel\ cc, dd: T \cross \nat \\
+	\circchannel\ c\_i, d\_i: T \cross \nat \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: \nat | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        \t1 Read \circdef c!v \then \Skip \\
+        \t1 Write \circdef d?x \then \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+
+\begin{circus}
+    \circprocess\ RIP \circdef (~ i:\{1,2\} \circindex P ~) \lcircrename c\_i, d\_i := cc, dd \rcircrename \\
+\end{circus}

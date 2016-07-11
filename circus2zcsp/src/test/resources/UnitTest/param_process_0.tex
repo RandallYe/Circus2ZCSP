@@ -1,0 +1,17 @@
+
+\begin{zsection}
+  \SECTION\ param\_process\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+    [GSET] \\
+	W == 0 .. 3 
+\end{zed}
+
+% the type of parameter v can not be a basic type like \num, \nat etc since it can not be enumerated
+\begin{circus}
+    \circprocess\ P0 \circdef  x,y: \{1,2\}; z: 1..3; w: W; g:GSET \circspot \circbegin  \\
+        \t1 \circspot \Skip \\
+    \circend
+\end{circus}
+

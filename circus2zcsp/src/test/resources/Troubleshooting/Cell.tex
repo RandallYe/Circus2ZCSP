@@ -1,0 +1,23 @@
+% This spec can not be parsed successfully, but if we add the commented line, and then everything is fine.
+\begin{zsection}
+	\SECTION\ Cell \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	BIT == \{0, 1\} \\      % possible value of one bit
+\end{zed}
+
+\begin{circus}
+	\circchannel\ berase\\
+	\circchannel\ set\\
+\end{circus}
+
+\begin{circus}
+	\circprocess\ Cell \circdef \circbegin \\
+		\t1 \circstate\ CellState ~~==~~ [~ v: BIT | true ~] \\
+    	\t1	CellInit ~~==~~ [~ (CellState)' | v' = 0 ~] \\
+        % \t1 A \circdef set \then v:=0 \\ % if we add this definition, this specification is parsed successfully. Otherwise, there's an error.
+	    \t1 \circspot \lschexpract CellInit \rschexpract \circseq (\circmu X \circspot ( (set \then v:=0) \circseq X)) \\
+	\circend
+\end{circus}
+

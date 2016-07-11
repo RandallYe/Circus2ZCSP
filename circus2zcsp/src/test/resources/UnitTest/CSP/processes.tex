@@ -1,0 +1,35 @@
+% predicate/logic 
+
+\begin{zsection}
+  \SECTION\ procs \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+\end{zed}
+
+\begin{circus}
+	\circchannel\ read, write: T\\
+	\circchannel\ in, out: T\\
+	\circchannelset\ CS == \lchanset in, out \rchanset \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: T | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq \Skip \\ 
+	\circend
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P1 \circdef P \circseq P \extchoice P \intchoice P \lpar \lchanset in, out \rchanset \rpar P \interleave P \circhide CS
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P2 \circdef \Semi x: \langle 0, 1 \rangle \circspot P1  \\
+    \circprocess\ P3 \circdef \Extchoice x: T \circspot P1  \\
+    \circprocess\ P4 \circdef \Intchoice x: T \circspot P1  \\
+    \circprocess\ P5 \circdef \Interleave x: T \circspot P1  \\
+    \circprocess\ P6 \circdef \Parallel x: T \lpar CS \rpar \circspot P1  \\
+\end{circus}

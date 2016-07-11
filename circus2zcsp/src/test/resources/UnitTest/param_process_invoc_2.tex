@@ -1,0 +1,19 @@
+% test anonymous parametrised process invocation
+\begin{zsection}
+  \SECTION\ param\_process\_invoc\_2 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{circus}
+    \circprocess\ P1 \circdef (v: \{1, 2, 3\}; w: \{1,2\} \circspot \circbegin  \\
+    	\t1 \circstate\ State == [~ x:\nat | true ~] \\
+    	\t1	Init == [~ (State)' | x' = v \lor x' = w~] \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq \Skip \\
+    \circend)(1,2) 
+    %
+    \interleave 
+    (v: \{1, 2, 3\} \circspot \circbegin  \\
+    	\t1 \circstate\ State == [~ x:\nat | true ~] \\
+    	\t1	Init == [~ (State)' | x' = v ~] \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq \Skip \\
+    \circend)(1) \\
+\end{circus}

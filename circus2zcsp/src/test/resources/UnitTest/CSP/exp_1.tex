@@ -1,0 +1,28 @@
+% number 
+
+\begin{zsection}
+  \SECTION\ exp\_1 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+\end{zed}
+
+\begin{circus}
+	\circchannel\ read: \nat\\
+	\circchannel\ write: \nat_1\\
+	\circchannel\ in: \num\\
+	\circchannel\ out: \num_1\\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: T | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        %\t1 Read \circdef \circvar x:T \circspot read?x \then write.succ~x \then write.(-x) \then write.(x-1) \then write.(x+1) \then write.(x*1) \then write.(x \div 1) \then write.(x \mod 2) \then \Skip \\
+        \t1 Read \circdef \circvar x:T \circspot read?x \then write.(succ~1) \then write.(\negate x) \then write.(x-1) \then write.(x+1) \then write.(x*1) \then write.(x \div 1) \then write.(x \mod 2) \then \Skip \\
+        \t1 Write \circdef \circvar x:T \circspot \lcircguard (x \leq 1) \land (x < 1) \land (x \geq 1) \land (x > 1) \rcircguard \circguard write!(min~T) \then write!(max~T) \then \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+

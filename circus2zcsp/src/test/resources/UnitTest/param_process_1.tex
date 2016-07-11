@@ -1,0 +1,13 @@
+
+\begin{zsection}
+  \SECTION\ param\_process\_1 \parents\ circus\_toolkit
+\end{zsection}
+
+% the type of parameter v can not be a basic type like \num, \nat etc since it can not be enumerated
+\begin{circus}
+    \circprocess\ P1 \circdef  v: \{1,2\} \circspot \circbegin  \\
+    	\t1 \circstate\ State == [~ x:\nat | true ~] \\
+    	\t1	Init == [~ (State)' | x' = v ~] \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq \Skip \\
+    \circend
+\end{circus}

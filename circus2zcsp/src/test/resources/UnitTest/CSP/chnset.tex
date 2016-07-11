@@ -1,0 +1,25 @@
+% predicate/logic 
+
+\begin{zsection}
+  \SECTION\ chnset \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+\end{zed}
+
+\begin{circus}
+	\circchannel\ c,d,e\\
+	\circchannel\ in, out: T\\
+\end{circus}
+
+\begin{circus}
+    \circchannelset CS0 == \lchanset \rchanset \\
+    \circchannelset CS1 == \lchanset c, d, e \rchanset \\
+    \circchannelset CS2 == \lchanset in, out \rchanset \\
+    \circchannelset CS3 == CS1 \cup CS2 \\
+    \circchannelset CS4 == CS1 \cap CS2 \\
+    \circchannelset CS5 == CS1 \setminus CS2 \\
+    \circchannelset CS6 == CS1 \symdiff \lchanset c \rchanset \\
+\end{circus}
+

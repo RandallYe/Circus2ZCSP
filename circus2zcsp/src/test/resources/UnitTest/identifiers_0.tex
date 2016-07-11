@@ -1,0 +1,25 @@
+\begin{zsection}
+  \SECTION\ Identifiers\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ read, write: T \\
+	\circchannel\ in, out: T \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 Record == [~ x,y: \nat ~] \\
+        \t1 \circstate\ State == [~ v: \nat; r: Record | true ~] \\
+        \t1 Init_1 ~~==~~ [~ (State)' | v' = 0 \land (\exists Record @ x = 3 \land y = 6) ~] \\
+        \t1 CellWrite ~~==~~ [~ \Delta State; x?: \nat | v' = x? ~] \\
+        \t1 Temp ~~==~~ [~ \Delta State; x?: \nat | v' = x? \land (\exists x,y:\nat @ x = 3 \land 6 = 6 \land r' = \theta Record) ~] \\
+        \t1 Read^1 \circdef read!v \then \Skip \\
+        \t1 Write \circdef write?x \then \lschexpract CellWrite \rschexpract \\
+        \t1 \circspot \lschexpract Init_1 \rschexpract \circseq (\circmu X \circspot (Read^1 \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}

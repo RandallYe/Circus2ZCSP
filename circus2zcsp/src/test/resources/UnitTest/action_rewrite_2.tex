@@ -1,0 +1,31 @@
+% 
+\begin{zsection}
+  \SECTION\ action\_rewrite\_2 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+    T == \{1, 2\} \\
+	Tx == 0 .. 3 \\ 
+	Ty == 4 .. 6 \\ 
+	Tz == 7 .. 9 \\ 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ in: Tx \cross Ty \cross Tz \\
+	\circchannel\ out: Tx \cross Ty \cross Tz \\
+	\circchannel\ index: T \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 S1 ~~==~~ [~  x: Tx; y: Ty | x \geq 1 \land y \neq 5 ~] \\
+        \t1 \circstate\ State ~~==~~ [~ S1; z: Tz | z > 7 ~] \\
+        \t1 Init ~~==~~ [~ (State)' | x' = 1 \land y' = 4 \land z' = 8 ~] \\
+        \t1 Update ~~==~~ [~ \Delta State; x?:Tx; y?:Ty; z?: Tz | x' = x? \land y' = y? \land z' = z? ~] \\
+        \t1 Output \circdef out!x!y!z \then \Skip \\
+        \t1 Input \circdef in?x?y?z \then \lschexpract Update \rschexpract \\
+        \t1 PAction \circdef i: T \circspot index!i \then \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Output \extchoice Input \intchoice PAction(1)) \circseq (i:T \circspot index!i \then \Skip)(2) \circseq X) \\ 
+	\circend
+\end{circus}
+

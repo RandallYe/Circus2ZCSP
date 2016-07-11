@@ -1,0 +1,31 @@
+% 
+\begin{zsection}
+  \SECTION\ action\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+    T == \{0, 1, 2\} \\
+	Tx == 0 .. 3 \\ 
+	Ty == 4 .. 6 \\ 
+	Tz == 7 .. 9 \\ 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ in: Tx \cross Ty \cross Tz \\
+	\circchannel\ out: Tx \cross Ty \cross Tz \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 S1 ~~==~~ [~  x: Tx; y: Ty | x \geq 1 \land y \neq 5 ~] \\
+        \t1 \circstate\ State ~~==~~ [~ S1; z: Tz | z > 7 ~] \\
+        \t1 Init ~~==~~ [~ (State)' | x' = 1 \land y' = 4 \land z' = 8 ~] \\
+        \t1 Update ~~==~~ [~ \Delta State; x?:Tx; y?:Ty; u!:Tx; z?: Tz; v!:Ty; w!:Tz | x' = x? \land y' = y? \land z' = z? \land u! = x \land v! = y \land w! = z ~] \\
+        \t1 Output \circdef out!x!y!z \then \Skip \\
+        \t1 Input \circdef \circvar u:Tx; v:Ty; w:Tz \circspot in?x?y?z \then \lschexpract Update \rschexpract \\
+        \t1 ActionSpec \circdef (\circvar l:T \circspot (l := 1 \circseq x,l \prefixcolon [~ x > 0 \land y \leq 5 \land l = 1, x' = l \land l' = 0 \land y' = z - 3 \land z' \geq 8 ~])) \\
+        \t1 ActionAssump \circdef (\circvar l:T \circspot (l := 1 \circseq \{~ x > 0 \land y \leq 5 \land l = 1 ~\} \circseq [~ x' = l \land l' = 0 \land y' = z - 3 \land z' \geq 8 ~])) \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Output \extchoice Input \extchoice ActionAssump \extchoice ActionSpec) \circseq X) \\ 
+	\circend
+\end{circus}
+

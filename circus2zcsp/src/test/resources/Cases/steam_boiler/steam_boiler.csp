@@ -1,0 +1,955 @@
+-- From Jim's Paper "A Circus Steam Boiler using the unifying theory of Z and CSP"
+
+----------------------------------------------------------------------
+-- Abstract steam-boiler code
+--
+-- checked with FDR 2.78: 15.10 14.6.01
+----------------------------------------------------------------------
+
+datatype Mode = initialisation | normal | degraded | rescue |
+                emergencyStop
+
+NonEmergencyModes = { initialisation, normal, degraded, rescue }
+
+channel getmode, putmode: Mode
+
+ModeStateInterface = {| getmode, putmode |}
+
+ModeState =
+  let
+    MS(m) = putmode?n -> MS(n)
+            []
+            getmode!m -> MS(m)
+  within
+    MS(initialisation)
+
+EnterMode(m) = reportmode!m -> putmode!m -> SKIP
+
+channel ainfo, areport, clocktick, endcycle, endreport,
+        afailuresrepairs, ainput, apumps, startcycle, startexec,
+        startreport
+
+channel aoutput, reportmode : Mode
+
+TAnalyserInterface = { startcycle }
+
+TAControllerInterface1 = { ainfo, startexec }
+
+TACReporterInterface1 =
+  {| apumps, areport, endreport, afailuresrepairs, reportmode,
+     startreport |}
+
+cycletime = 5
+
+cyclelimit = cycletime - 1
+
+Time = { 0 .. cyclelimit }
+
+TCycle(time) =
+  ( if ( time + 1 ) % cycletime == 0 then startcycle -> SKIP else SKIP);
+  clocktick -> TCycle(( time + 1 ) % cycletime)
+
+Timer = TCycle(cyclelimit)
+
+Analyser1 = startcycle -> ainput -> startexec -> InfoService1
+
+InfoService1 =
+  ainfo -> InfoService1
+  []
+  afailuresrepairs -> apumps -> Analyser1
+
+TAnalyser1 =
+  ( Timer [| TAnalyserInterface |] Analyser1 ) \ TAnalyserInterface
+
+assert TAnalyser1 :[  deadlock free  [FD] ]
+
+assert TAnalyser1 :[  livelock free  [FD] ]
+
+Controller1 =
+  startexec ->
+    startreport ->
+      NewModeAnalysis1;
+      getmode?m ->
+        ( if m != emergencyStop then
+             |~|i: { 0 .. limit } @ PutReports(i)
+          else SKIP );
+        endreport -> Controller1
+
+NewModeAnalysis1 =
+  ainfo -> EnterMode(emergencyStop)
+  |~|
+  (
+    ( |~| i: { 0 .. limit } @ GetInformation(i) );
+    getmode?mode ->
+      if mode == initialisation then InitModeAnalysis1
+      else if mode == normal then NormalModeAnalysis1
+      else if mode == degraded then DegradedModeAnalysis1
+      else if mode == rescue then RescueModeAnalysis1
+      else SKIP
+    )
+
+InitModeAnalysis1 =
+  SKIP |~| EnterMode(normal) |~| EnterMode(degraded) |~|
+    EnterMode(emergencyStop)
+
+NormalModeAnalysis1 =
+  SKIP |~| EnterMode(rescue) |~| EnterMode(degraded)
+
+DegradedModeAnalysis1 =
+  SKIP |~| EnterMode(normal) |~| EnterMode(rescue)
+
+RescueModeAnalysis1 =
+  SKIP |~| EnterMode(normal) |~| EnterMode(degraded)
+
+limit = 8
+
+Get(event,n) = if n > 0 then event -> Get(event,n-1) else SKIP
+
+GetInformation(n) = Get(ainfo,n)
+
+PutReports(n) = Get(areport,n)
+
+TAController1 =
+  ( TAnalyser1
+    [| TAControllerInterface1 |]
+    ( Controller1
+      [| ModeStateInterface |]
+      ModeState
+    ) \ ModeStateInterface
+  ) \ TAControllerInterface1
+
+assert TAController1 :[  livelock free  [FD] ]
+
+Reporter1 = startreport -> ReportService1
+
+ReportService1 =
+  [] m: NonEmergencyModes @ reportmode.m -> putmode!m -> ReportService1
+  []
+  areport -> ReportService1
+  []
+  reportmode.emergencyStop ->
+    putmode!emergencyStop ->
+      TidyUp1
+  []
+  TidyUp1
+
+TidyUp1 =
+  endreport ->
+    afailuresrepairs ->
+      getmode?m ->
+        aoutput!m ->
+          apumps ->
+            Reporter1
+
+TACReporter1 =
+  ( TAController1
+     [| TACReporterInterface1 |]
+    (
+      ( Reporter1
+         [| ModeStateInterface |]
+        ModeState
+      ) \ ModeStateInterface
+    )
+  ) \ TACReporterInterface1
+
+assert TACReporter1 :[  deadlock free  [FD] ]
+
+assert TACReporter1 :[  livelock free  [FD] ]
+
+SteamBoiler1 = TACReporter1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------
+-- Analyser
+----------------------------------------------------------------------
+
+channel levelbelowmin, levelabovemax
+
+channel emergencystop, failures, levelokay, nonqfailure,
+        physicalunitsready, qfailure, sbwaiting, vzero: Bool
+
+Analyser = AnalyserCycle
+
+AnalyserCycle = startcycle -> ainput -> startexec -> InfoService
+
+InfoService =
+  OfferInformation; InfoService
+  []
+  afailuresrepairs ->
+    apumps ->
+      AnalyserCycle
+
+OfferInformation =
+  ( |~| b: Bool @ emergencystop.b -> SKIP )
+  []
+  ( |~| b: Bool @ sbwaiting.b -> SKIP )
+  []
+  ( |~| b: Bool @ vzero.b -> SKIP )
+  []
+  ( levelokay.true -> SKIP
+    |~|
+    ( levelokay.false -> SKIP
+      []
+      ( levelabovemax -> SKIP
+        |~|
+        levelbelowmin -> SKIP
+      )
+    )
+  )
+  []
+  ( |~| b: Bool @ physicalunitsready.b -> SKIP )
+  []
+  ( ( failures.false -> SKIP
+      []
+      qfailure.false -> SKIP
+      []
+      nonqfailure.false -> SKIP
+    )
+    |~|
+    ( failures.true -> SKIP
+      []
+      ( ( qfailure.true -> SKIP
+          []
+          nonqfailure.true -> SKIP
+        )
+        |~|
+        ( qfailure.true -> SKIP
+          []
+          nonqfailure.false -> SKIP
+        )
+        |~|
+        ( qfailure.false -> SKIP
+          []
+          nonqfailure.true -> SKIP
+        )
+      )
+    )
+  )
+
+TAnalyser =
+  ( Timer
+    [| TAnalyserInterface |]
+    Analyser
+  ) \ TAnalyserInterface
+
+assert TAnalyser :[ deadlock free [FD] ]
+
+assert TAnalyser :[ livelock free [FD] ]
+
+AbsAnalyser =
+  Analyser
+    [[ e <- ainfo,
+       c.b <- ainfo
+     |
+       e <- { levelbelowmin, levelabovemax },
+       b <- Bool,
+       c <- { emergencystop,
+              failures,
+              levelokay,
+              nonqfailure,
+              physicalunitsready,
+              qfailure,
+              sbwaiting,
+              vzero
+            }
+    ]]
+
+AbsTAnalyser =
+  TAnalyser
+    [[ e <- ainfo,
+       c.b <- ainfo
+     |
+       e <- { levelbelowmin, levelabovemax },
+       b <- Bool,
+       c <- { emergencystop,
+              failures,
+              levelokay,
+              nonqfailure,
+              physicalunitsready,
+              qfailure,
+              sbwaiting,
+              vzero
+            }
+    ]]
+
+assert Analyser1 [FD= AbsAnalyser
+
+assert TAnalyser1 [FD= AbsTAnalyser
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------
+-- Controller
+----------------------------------------------------------------------
+
+channel startpumps, stoppumps, openvalve, closevalve, sendprogready
+
+Information =
+  {| emergencystop, failures, levelabovemax, levelbelowmin, levelokay,
+     nonqfailure, physicalunitsready, qfailure, sbwaiting, vzero |}
+
+Reports =
+  { startpumps, stoppumps, openvalve, closevalve, sendprogready }
+
+TAControllerInterface = union( { startexec }, Information )
+
+Controller = ControllerCycle
+
+ControllerCycle =
+  startexec -> startreport -> NewModeAnalysis;
+  AdjustLevel;
+  endreport -> ControllerCycle
+
+NewModeAnalysis =
+  emergencystop.true -> EnterMode(emergencyStop)
+  []
+  emergencystop.false ->
+    getmode?mode ->
+      if mode == initialisation then InitModeAnalysis
+      else if mode == normal then NormalModeAnalysis
+      else if mode == degraded then DegradedModeAnalysis
+      else if mode == rescue then RescueModeAnalysis
+      else SKIP
+
+InitModeAnalysis =
+  sbwaiting.true ->
+    ( vzero.true ->
+        ( qfailure.false ->
+            ( physicalunitsready.true ->
+                ( levelokay.true ->
+                    ( failures.false -> EnterMode(normal)
+                      []
+                      failures.true -> EnterMode(degraded)
+                    )
+                  []
+                  levelokay.false -> EnterMode(emergencyStop)
+                )
+              []
+              physicalunitsready.false ->
+                ( levelokay.true -> sendprogready -> SKIP
+                  []
+                  levelokay.false -> SKIP
+                )
+            )
+          []
+          qfailure.true -> EnterMode(emergencyStop)
+        )
+      []
+      vzero.false -> EnterMode(emergencyStop)
+    )
+  []
+  sbwaiting.false -> SKIP
+
+NormalModeAnalysis =
+  failures.false -> SKIP
+  []
+  qfailure.true -> EnterMode(rescue)
+  []
+  nonqfailure.true -> EnterMode(degraded)
+
+DegradedModeAnalysis =
+  qfailure.false ->
+    ( failures.true -> SKIP
+      []
+      failures.false -> EnterMode(normal)
+    )
+  []
+  qfailure.true -> EnterMode(rescue)
+
+RescueModeAnalysis =
+  qfailure.true -> SKIP
+  []
+  qfailure.false ->
+    ( failures.false -> EnterMode(normal)
+      []
+      failures.true -> EnterMode(degraded)
+    )
+
+AdjustLevel =
+  getmode?m ->
+    if m == emergencyStop then SKIP
+    else
+      levelbelowmin -> RaiseLevel
+      []
+      levelabovemax -> ReduceLevel
+      []
+      levelokay.true -> RetainLevel
+
+RaiseLevel =
+  StartPumps;
+  getmode?mode ->
+    if mode == initialisation then CloseValve else SKIP
+
+ReduceLevel =
+  StopPumps;
+  getmode?mode ->
+    if mode == initialisation then OpenValve else SKIP
+
+RetainLevel =
+  StopPumps;
+  getmode?mode ->
+    if mode == initialisation then CloseValve else SKIP
+
+StartPumps = startpumps -> SKIP
+
+StopPumps = stoppumps -> SKIP
+
+OpenValve = openvalve -> SKIP
+
+CloseValve = closevalve -> SKIP
+
+MSController =
+  ( Controller
+    [| ModeStateInterface |]
+    ModeState
+  ) \ ModeStateInterface
+
+assert MSController :[ deadlock free [FD] ]
+
+assert MSController :[ livelock free [FD] ]
+
+
+TAController =
+  ( TAnalyser
+    [| TAControllerInterface |]
+    MSController
+  ) \ TAControllerInterface
+
+AbsTAController =
+  TAController
+    [[ f <- areport
+     |
+       f <- { startpumps, stoppumps, openvalve, closevalve,
+              sendprogready }
+    ]]
+
+
+
+----------------------------------------------------------------------
+-- Reporter
+----------------------------------------------------------------------
+
+TACReporterInterface =
+  union( {| startreport, reportmode, endreport, afailuresrepairs,
+            apumps |}, Reports )
+
+Reporter = startreport -> ReportService
+
+ReportService =
+  GatherReports; ReportService
+  []
+  reportmode.emergencyStop ->
+    putmode!emergencyStop ->
+      endreport ->
+        TidyUp
+  []
+  endreport -> TidyUp
+
+TidyUp =
+  afailuresrepairs ->
+    getmode?m ->
+      aoutput!m ->
+        apumps ->
+          Reporter
+
+GatherReports =
+  [] m: NonEmergencyModes @ reportmode.m -> putmode!m -> SKIP
+  []
+  sendprogready -> SKIP
+  []
+  startpumps -> SKIP
+  []
+  stoppumps -> SKIP
+  []
+  openvalve -> SKIP
+  []
+  closevalve -> SKIP
+
+TACReporter =
+  ( TAController
+    [| TACReporterInterface |]
+    ( ( Reporter
+        [| ModeStateInterface |]
+        ModeState
+      ) \ ModeStateInterface
+    )
+  ) \ TACReporterInterface
+
+assert TACReporter :[ deadlock free [FD] ]
+
+assert TACReporter :[ livelock free [FD] ]
+
+assert TACReporter1 [FD= TACReporter
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------
+-- Requirements checks
+----------------------------------------------------------------------
+
+-- In the initialisation mode, the program waits for the steam-boiler
+-- waiting message.
+
+WaitForSBWaiting =
+  startexec ->
+    startreport ->
+      emergencystop.false ->
+        sbwaiting.false ->
+          levelokay.true ->
+            stoppumps ->
+              closevalve ->
+                endreport ->
+                  WaitForSBWaiting
+
+assert ( MSController
+         [| { levelabovemax, levelbelowmin, sbwaiting.true,
+              emergencystop.true } |]
+         STOP
+       )
+       [FD=
+       WaitForSBWaiting
+
+assert WaitForSBWaiting
+       [FD=
+       ( MSController
+         [| { levelabovemax, levelbelowmin, sbwaiting.true,
+              emergencystop.true } |]
+         STOP
+        )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- As soon as the sbwaiting message has been received, the controller
+-- checks to see if the quantity of steam coming out of the boiler
+-- really is zero; if it isn't, then it enters emergency stop.
+
+alphaMoveToSBWaiting =
+  { startexec, emergencystop.false, sbwaiting.true }
+
+MoveToSBWaiting =
+  startexec ->
+    startreport ->
+      emergencystop.false ->
+        sbwaiting.true ->
+          SKIP
+
+RUN(s) =
+  let
+    R = [] x: s @ x -> R
+  within
+    R
+
+alphaMSC =
+  union( Information,
+    union( Reports,
+      { startexec, startreport, endreport }
+    )
+  )
+
+CheckSteamRateIsZero =
+  MoveToSBWaiting;
+  vzero.false ->
+    reportmode!emergencyStop ->
+      endreport ->
+        Idle
+
+Idle =
+  startexec -> startreport -> emergencystop.false -> endreport -> Idle
+
+assert ( MSController
+         [| { emergencystop.true, sbwaiting.false, vzero.true } |]
+         STOP )
+       [FD=
+       CheckSteamRateIsZero
+
+assert CheckSteamRateIsZero
+       [FD=
+       ( MSController
+         [| { emergencystop.true, sbwaiting.false, vzero.true } |]
+         STOP )
+
+-- If the quantity of water in the steam boiler is above N2, then it
+-- activates the valve in order to empty it.
+
+alphaMoveToRateZero =
+  union( alphaMoveToSBWaiting, { vzero.true } )
+
+MoveToRateZero = MoveToSBWaiting; vzero.true -> SKIP
+
+alphaMoveToPhysicalUnitsNotReady =
+  union( alphaMoveToRateZero,
+         { qfailure.false, physicalunitsready.false } )
+
+MoveToPhysicalUnitsNotReady =
+  MoveToRateZero;
+  qfailure.false ->
+    physicalunitsready.false ->
+      SKIP
+
+alphaMoveToPhysicalUnitsNotReadyLevelAboveMax =
+  union( alphaMoveToPhysicalUnitsNotReady,
+         { levelokay.false, levelabovemax } )
+
+MoveToPhysicalUnitsNotReadyLevelAboveMax =
+  MoveToPhysicalUnitsNotReady;
+    levelokay.false ->
+      levelabovemax ->
+        SKIP
+
+TestLevelAboveMaxStopPumpsOpenValve =
+  MoveToPhysicalUnitsNotReadyLevelAboveMax;
+  stoppumps ->
+    openvalve ->
+      CHAOS(alphaMSC)
+
+alphaTest1 =
+  union( alphaMoveToPhysicalUnitsNotReadyLevelAboveMax,
+         { emergencystop.true,
+           sbwaiting.false,
+           vzero.false,
+           qfailure.true,
+           physicalunitsready.true,
+           levelokay.true,
+           levelbelowmin,
+           startreport } )
+
+assert TestLevelAboveMaxStopPumpsOpenValve
+       [FD=
+       ( MSController
+         [| alphaTest1 |]
+         MoveToPhysicalUnitsNotReadyLevelAboveMax
+       )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- If the quantity of water in the steam boiler is below N1, then it
+-- activates the pumps to fill it.
+
+CheckInitBelowN1 =
+  MoveToPhysicalUnitsNotReady;
+    levelokay.false ->
+      levelbelowmin ->
+        startpumps ->
+           closevalve ->
+             STOP
+
+assert MSController [T= CheckInitBelowN1
+
+alphaMoveToPhysicalUnitsNotReadyLevelBelowMin =
+  union( alphaMoveToPhysicalUnitsNotReady,
+         { levelokay.false, levelbelowmin } )
+
+MoveToPhysicalUnitsNotReadyLevelBelowMin =
+  MoveToPhysicalUnitsNotReady;
+  levelokay.false ->
+    levelbelowmin ->
+      SKIP
+
+TestLevelBelowMinStartPumpsCloseValve =
+  MoveToPhysicalUnitsNotReadyLevelBelowMin;
+  startpumps ->
+    closevalve ->
+      CHAOS(alphaMSC)
+
+alphaTest2 =
+  union( alphaMoveToPhysicalUnitsNotReadyLevelBelowMin,
+         { emergencystop.true,
+           sbwaiting.false,
+           vzero.false,
+           qfailure.true,
+           physicalunitsready.true,
+           levelokay.true,
+           levelabovemax,
+           startreport } )
+
+assert TestLevelBelowMinStartPumpsCloseValve
+       [FD=
+       ( MSController
+         [| alphaTest2 |]
+         MoveToPhysicalUnitsNotReadyLevelBelowMin
+       )
+
+
+
+-- If the program realises a failure of the water level detection unit
+-- it enters the emergency stop mode.
+
+alphaTest3 =
+  union( alphaMoveToRateZero,
+         { emergencystop.true,
+           sbwaiting.false,
+           vzero.false,
+           qfailure.false,
+           startreport
+           } )
+
+TestWaterLevelFailureEmergencyStop =
+  MoveToRateZero;
+  qfailure.true ->
+    reportmode.emergencyStop ->
+      CHAOS(alphaMSC)
+
+assert TestWaterLevelFailureEmergencyStop
+       [FD=
+       ( MSController
+         [| alphaTest3 |]
+         MoveToRateZero
+       )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- As soon as a level between N1 and N2 has been reached, the program
+-- can send continuously the signal sendprogready until it receives
+-- the signal physicalunitsready.true.
+
+
+alphaTest4 =
+  { physicalunitsready.true, emergencystop.true, sbwaiting.false,
+    vzero.false, qfailure.true, levelokay.false, levelabovemax,
+    levelbelowmin }
+
+TestLevelInRangeSendProgReady =
+  startexec ->
+    startreport ->
+      emergencystop.false ->
+        sbwaiting.true ->
+          vzero.true ->
+            qfailure.false ->
+              physicalunitsready.false ->
+                levelokay.true ->
+                  sendprogready ->
+                    levelokay.true ->
+                      stoppumps ->
+                        closevalve ->
+                          endreport ->
+                            TestLevelInRangeSendProgReady
+
+assert TestLevelInRangeSendProgReady
+       [FD=
+       ( MSController
+         [| alphaTest4 |]
+         STOP
+       )
+
+assert ( MSController
+         [| alphaTest4 |]
+         STOP
+       )
+       [FD=
+       TestLevelInRangeSendProgReady
+
+
+
+
+
+
+
+
+
+
+-- As soon as [physicalunitsready.true] signal has been received, the
+-- program enters either the mode normal, if all the physical units
+-- operate correctly, or the mode degraded, if any physical unit is
+-- defective.
+
+WaitForPhysicalUnitsReadyNoFailures =
+  RUN(diff(alphaMSC,{physicalunitsready.true, emergencystop.true,
+                     vzero.false, qfailure.true}))
+
+InsistOnNormal =
+  WaitForPhysicalUnitsReadyNoFailures
+  []
+  physicalunitsready.true ->
+    levelokay.true ->
+      failures.false ->
+        reportmode.normal -> RUN(alphaMSC)
+
+assert MSController
+       [| alphaMSC |]
+       InsistOnNormal :[ deadlock free [FD] ]
+
+WaitForPhysicalUnitsReadyFailures =
+  RUN(diff(alphaMSC,{physicalunitsready.true, emergencystop.true,
+                     vzero.false, qfailure.true}))
+
+InsistOnDegraded =
+  WaitForPhysicalUnitsReadyFailures
+  []
+  physicalunitsready.true ->
+    levelokay.true ->
+      failures.true ->
+        reportmode.degraded -> RUN(alphaMSC)
+
+assert MSController
+       [| alphaMSC |]
+       InsistOnDegraded :[ deadlock free [FD] ]

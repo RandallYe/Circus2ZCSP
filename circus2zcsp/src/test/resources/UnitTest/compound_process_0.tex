@@ -1,0 +1,41 @@
+\begin{zsection}
+  \SECTION\ compound\_process\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ read, write: T \\
+	\circchannel\ in, out: T \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: \nat | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        \t1 CellWrite ~~==~~ [~ \Delta State; x?: \nat | v' = x? ~] \\
+        \t1 Read \circdef read!v \then \Skip \\
+        \t1 Write \circdef write?x \then \lschexpract CellWrite \rschexpract \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+
+\begin{circus}
+    \circprocess\ Q \circdef \circbegin \\
+        %\t1 \circstate\ State == [~ v: \nat | true ~] \\
+        %\t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        \t1 Read \circdef read?x \then out!x \then \Skip \\
+        \t1 Write \circdef in?x \then write!x \then \Skip \\
+        \t1 \circspot (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+
+\begin{circus}
+    \circprocess\ CMP0 \circdef (P \circseq Q) \extchoice (P \intchoice Q)\\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ CMP1 \circdef (P \lpar \lchanset read, write \rchanset \rpar Q) \circhide \lchanset read,write \rchanset \\
+\end{circus}

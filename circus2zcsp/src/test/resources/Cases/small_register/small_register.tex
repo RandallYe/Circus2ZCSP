@@ -1,0 +1,36 @@
+\documentclass{article}
+%
+\usepackage{circus}
+%
+\begin{document}
+
+\begin{zsection}
+	\SECTION\ small\_register \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	REG == 0 .. 31 \\
+	NAT == 0 .. 2 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ read, write, add: REG\\
+\end{circus}
+
+\begin{circus}
+	\circprocess\ Register \circdef \circbegin \\
+    	\t1 \circstate\ State == [~ reg: REG | true ~] \\
+    	\t1	Init == [~ (State)' | reg' = 0 ~] \\
+		\t1 Read == [~ \Xi State; r!:REG | r! = reg ~] \\
+%		\t1 fRead == [~ \Xi State | \lnot \pre Read ~] \\
+		\t1 Add == [~ \Delta State; i?:REG; r!:REG | i? + reg \in REG \land reg' = reg + i? \land r! = reg + i? ~] \\
+		\t1 Write == [~ \Delta State; w?:REG | reg' = w? ~] \\
+		\t1 Run \circdef (\circvar\ r: REG \circspot (Read \circseq read!r \then \Skip)) \extchoice (write?w \then Write) 
+			\extchoice (add?i \then (\circvar\ r:REG \circspot (Add \circseq read!r \then \Skip)))
+			\\
+		\t1 \circspot Init \circseq (\circmu X \circspot (Run \circseq X)) \\
+	\circend
+\end{circus}
+
+
+\end{document}

@@ -1,0 +1,108 @@
+\begin{zsection}
+  \SECTION\ indexed\_renaming\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ c, d: T \\
+	\circchannel\ cc, dd: T \cross \nat \\
+	\circchannel\ c\_i, d\_i: T \cross \nat \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ IP \circdef i:\{1,2\} \circindex \circbegin \\
+        \t1 \circstate\ State == [~ v: \nat | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        \t1 Read \circdef c!v \then \Skip \\
+        \t1 Write \circdef d?x \then \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+
+\begin{circus}
+    \circprocess\ RIP \circdef (IP) \lcircrename c\_i, d\_i := cc, dd \rcircrename \\
+\end{circus}
+
+% This specification will lead to Type Check Error
+%
+% Refer to ./parser/parser-src/src/main/resources/templates/Parser.xml
+% Ln: 6096 production for 'processDesc ::='
+%   action code: createRenameProcess with CallUsage.Parametrised for CallProcess,
+% Actually for RenameProcess, we expect CallUsage.Indexed
+% 
+% One solution to correct it to define P as explicitly defined process, then
+%   \circprocess\ RIP \circdef (i:\{1,2\} \circindex P) \lcircrename c\_i, d\_i := cc, dd \rcircrename \\
+
+%%%%%%% Error log %%%%%%%%%
+%net.sourceforge.czt.util.CztException: Type Check Error!
+%	at net.sourceforge.czt.circus2zcsp.util.TestUtils.urlToTerm(TestUtils.java:320)
+%	at net.sourceforge.czt.circus2zcsp.CircusRewriteVisitorTest.testRenamingProcess1(CircusRewriteVisitorTest.java:354)
+%	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+%	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+%	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+%	at java.lang.reflect.Method.invoke(Method.java:597)
+%	at junit.framework.TestCase.runTest(TestCase.java:168)
+%	at junit.framework.TestCase.runBare(TestCase.java:134)
+%	at junit.framework.TestResult$1.protect(TestResult.java:110)
+%	at junit.framework.TestResult.runProtected(TestResult.java:128)
+%	at junit.framework.TestResult.run(TestResult.java:113)
+%	at junit.framework.TestCase.run(TestCase.java:124)
+%	at junit.framework.TestSuite.runTest(TestSuite.java:232)
+%	at junit.framework.TestSuite.run(TestSuite.java:227)
+%	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:79)
+%	at org.eclipse.jdt.internal.junit4.runner.JUnit4TestReference.run(JUnit4TestReference.java:50)
+%	at org.eclipse.jdt.internal.junit.runner.TestExecution.run(TestExecution.java:38)
+%	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:467)
+%	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:683)
+%	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.run(RemoteTestRunner.java:390)
+%	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.main(RemoteTestRunner.java:197)
+%Caused by: net.sourceforge.czt.session.CommandException: net.sourceforge.czt.typecheck.z.util.TypeErrorException: Section indexed_renaming_1 contains 1 error.
+%	ERROR "file:/Users/ykf_2001/Workspace/czt-code-20150622/circus2zcsp/target/test-classes/indexed_renaming_1.tex", line 25, column 32: 
+%Post checking calls for 'CALL_PROCESS' '( IP )' in process 'Cannot be printed' found '2' errors:
+%------------------------------
+%
+%Inconsistency process call.
+%	Process.: Cannot be printed
+%	Call....: IP
+%	Expected: Indexed
+%	Found...: Parameterised
+%------------------------------
+%
+%Wrong number of parameters in parameterised process call.
+%	Process.: Cannot be printed
+%	Call....: ( IP )
+%	Expected: 1 formal(s)
+%	Found...: 0 actual(s)
+%------------------------------
+%
+%	at net.sourceforge.czt.typecheck.z.TypeCheckCommand.doCompute(TypeCheckCommand.java:188)
+%	at net.sourceforge.czt.session.AbstractCommand.compute(AbstractCommand.java:53)
+%	at net.sourceforge.czt.session.SectionManager.get(SectionManager.java:1711)
+%	at net.sourceforge.czt.circus2zcsp.util.TestUtils.urlToTerm(TestUtils.java:297)
+%	... 20 more
+%Caused by: net.sourceforge.czt.typecheck.z.util.TypeErrorException: Section indexed_renaming_1 contains 1 error.
+%	ERROR "file:/Users/ykf_2001/Workspace/czt-code-20150622/circus2zcsp/target/test-classes/indexed_renaming_1.tex", line 25, column 32: 
+%Post checking calls for 'CALL_PROCESS' '( IP )' in process 'Cannot be printed' found '2' errors:
+%------------------------------
+%
+%Inconsistency process call.
+%	Process.: Cannot be printed
+%	Call....: IP
+%	Expected: Indexed
+%	Found...: Parameterised
+%------------------------------
+%
+%Wrong number of parameters in parameterised process call.
+%	Process.: Cannot be printed
+%	Call....: ( IP )
+%	Expected: 1 formal(s)
+%	Found...: 0 actual(s)
+%------------------------------
+%
+%	at net.sourceforge.czt.typecheck.z.TypeCheckCommand.doCompute(TypeCheckCommand.java:187)
+%	... 23 more
+%
+%

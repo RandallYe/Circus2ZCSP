@@ -1,0 +1,38 @@
+% function and its application
+
+\begin{zsection}
+  \SECTION\ type\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+	TT == 0 .. 9 \\
+	FT == T \fun TT \\
+    [NAME, PERSON] \\
+\end{zed}
+
+\begin{axdef}
+    f: FT 
+    \where
+    \forall x: T @ f~x = x*x
+\end{axdef}
+
+\begin{circus}
+	\circchannel\ read, write: T\\
+	\circchannel\ in, out: TT\\
+	\circchannel\ c: \power NAME \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: FT | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = \emptyset ~] \\
+        % function application in channel exp is not allowed by CZT?
+        %\t1 Read \circdef read?x \then out!f~x \then \Skip \\
+        %\t1 Write \circdef in?x \then write!f\inv~(x) \then \Skip \\
+        \t1 Read \circdef \circvar x:T \circspot \lcircguard f~x = v~x \rcircguard \circguard read?x \then \Skip \\
+        \t1 Write \circdef \circvar x:T \circspot \lcircguard f(x) = v(x) \rcircguard \circguard write!x \then \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+

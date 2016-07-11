@@ -1,0 +1,47 @@
+\documentclass{article}
+
+\usepackage{circus}
+
+\begin{document}
+
+\begin{zsection}
+\SECTION Fuel\_Pump \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{circus}
+	\circchannel\ init, liftNozzle, putNozzle, pressTrigger, releaseTrigger\\
+	\circchannel\ enterAmount, reload: \nat\\
+	\circchannelset\ SyncCustomer == \lchanset liftNozzle, pressTrigger, releaseTrigger, enterAmount \rchanset\\
+	\circchannelset\ SyncEmployee == \lchanset init, reload \rchanset\\
+\end{circus}
+
+\begin{circus}
+\circprocess\ Pump \circdef \circbegin
+\also %
+    \circstate\ PState == [ fuelQ: \nat ] \\
+    PInit == [ PState' | fuelQ' = 5000 ] \\
+	Reload == [ \Delta PState; q?: \nat | fuelQ' = (fuelQ + q?) ] \\
+	Supply == [ \Delta PState; q?: \nat | fuelQ > q? \land fuelQ' = fuelQ - q? ] \\
+	PumpIdle \circdef (liftNozzle \then PumpActive)
+        \extchoice 
+		(reload?q \then Reload)
+		\extchoice
+		(init \then PInit)\\
+	PumpActive \circdef (putNozzle \then Skip)
+		\extchoice
+		(enterAmount~?q \then 
+		( \lcircguard (q \leq fuelQ) \rcircguard \circguard pressTrigger \then Supply \circseq\ releaseTrigger \then Skip)
+		\extchoice
+		( \lcircguard (q > fuelQ) \rcircguard \circguard pressTrigger \circseq\ releaseTrigger \then Skip)
+		)
+		\\
+	\t1 @ init \then PInit \circseq\ (\circmu\ X @ (PumpIdle \circseq\ X)) \\
+	\circend
+\end{circus}
+
+\begin{circus}
+\circprocess\ SinglePumpEmployee \circdef (~ init \then reload~!1000 \then Skip ~) \\
+\circprocess\ SinglePumpStation \circdef (~ SinglePumpEmployee \lpar SyncEmployee \rpar Pump ~)  \circhide SyncEmployee 
+\end{circus}
+
+\end{document}

@@ -1,0 +1,95 @@
+\documentclass{article} %
+\usepackage{circus}
+%
+\begin{document}
+
+% Distributed Buffer Processes
+\begin{zsection}
+	\SECTION\ DisBufferSpec \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{axdef}
+    maxbuff: \nat_1 \\
+    maxring: \nat_1 
+    \where %
+    maxring = maxbuff - 1
+\end{axdef}
+
+\begin{zed}
+    RingIndex ~~==~~ 1 \upto maxring
+\end{zed}
+
+\begin{circus}
+	\circchannel\ input, output: \nat \\
+	\circchannel\ read, write: (RingIndex) \cross \nat \\
+	\circchannel\ rd, wrt: \nat \\
+    % these channels are implicitly declared.
+	\circchannel\ rd\_i, wrt\_i: (RingIndex) \cross \nat
+\end{circus}
+
+\begin{circus}
+	\circprocess\ Controller \circdef \circbegin \\
+        \t1 \circstate\ ControllerState == [~ \\
+            \t2 size: 0 \upto maxbuff; \\ 
+            \t2 ringsize: 0 \upto maxring; \\
+            \t2 cache: \nat; \\
+            \t2 top,bot: RingIndex | \\
+            \t2 ringsize \mod maxring  = (top - bot) \mod maxring \land \\
+            \t2 ringsize = max~\{~0, size-1~\} ~] \\
+    
+    	\t1	ControllerInit == [~ (ControllerState)' | \\
+            \t2 top' = 1 \land bot' = 1 \land size' = 0 ~] \\
+
+		\t1 CacheInput == [~ \Delta ControllerState; x? : \nat | \\
+            \t2 size = 0 \land size' = 1 \land \\
+            \t2 cache' = x? \land bot' = bot \land top' = top ~] \\
+
+        \t1 StoreInputController == [~ \Delta ControllerState | \\
+            \t2 0 < size \land size < maxbuff \land size' = size + 1 \land \\
+            \t2 cache' = cache \land bot' = bot \land top' = (top \mod maxring) + 1 ~] \\
+
+        \t1 InputController \circdef \lcircguard size < maxbuff \rcircguard \circguard input?x \then \\
+            \t2 (\lcircguard size = 0 \rcircguard \circguard \lschexpract CacheInput \rschexpract \extchoice \\
+            \t2 \lcircguard size > 0 \rcircguard \circguard write.top!x \then \lschexpract StoreInputController \rschexpract) \\
+
+		\t1 NoNewCache == [~ \Delta ControllerState | \\
+            \t2 size = 1 \land size' = 0 \land \\
+            \t2 cache' = cache \land bot' = bot \land top' = top ~] \\
+
+		\t1 StoreNewCacheController == [~ \Delta ControllerState; x?: \nat | \\
+            \t2 size > 1 \land size' = size - 1 \land \\
+            \t2 cache' = x? \land bot' = (bot \mod maxring) + 1 \land \\
+            \t2 top' = top ~] \\
+
+        \t1 OutputController \circdef \lcircguard size > 0 \rcircguard \circguard output!(cache) \then \\
+            \t2 (\lcircguard size > 1 \rcircguard \circguard read.bot?x \then \lschexpract StoreNewCacheController \rschexpract \extchoice \\
+            \t2 \lcircguard size = 1 \rcircguard \circguard \lschexpract NoNewCache \rschexpract) \\
+
+    \t1 \circspot \lschexpract ControllerInit \rschexpract \circseq (\circmu X \circspot (InputController \extchoice OutputController) \circseq X) \\
+	\circend
+\end{circus}
+
+%%%%%%%% Definition 1: indexed process %%%%%%%%%%
+\begin{circus}
+	\circprocess\ RingCell \circdef \circbegin \\
+        \t1 \circstate\ CellState == [~ v: \nat | true ~] \\
+        \t1 CellWrite ~~==~~ [~ \Delta CellState; x?: \nat | v' = x? ~] \\
+        \t1 Read \circdef rd!v \then \Skip \\
+        \t1 Write \circdef wrt?x \then \lschexpract CellWrite \rschexpract \\
+        \t1 \circspot (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+
+\begin{circus}
+    \circprocess\ IRCell \circdef (~i: RingIndex \circindex RingCell~) \lcircrename rd\_i, wrt\_i := read, write \rcircrename 
+\end{circus}
+
+\begin{circus}
+	\circprocess\ Ring \circdef (~ \Interleave i: RingIndex \circspot IRCell \lcircindex i \rcircindex ~)
+\end{circus}
+
+\begin{circus}
+	\circprocess\ Buffer \circdef (~ Controller \lpar \lchanset read, write \rchanset \rpar Ring ~) \circhide \lchanset read, write \rchanset
+\end{circus}
+
+\end{document}

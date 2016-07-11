@@ -1,0 +1,95 @@
+% a Circus program to test generic translation
+\documentclass{article} %
+\usepackage{circus}
+%
+\begin{document}
+
+\begin{zsection}
+	\SECTION\ Generic\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+% generic axiomatic definitions or constants
+\begin{gendef}[X, Y]
+    S, T: \power~(X \cross Y) 
+\where
+    S \subseteq T \\
+    \exists U: \power~(X \cross Y) \spot U \subset (S \cup T)
+\end{gendef}
+
+% generic boxed schema
+\begin{schema}{GenSch}[X]
+    a: X; b: \power~X
+\where
+    a \in b
+\end{schema}
+
+% instantiation of generic schema
+\begin{zed}
+    GenSchIns == GenSch[0 \upto 3]
+\end{zed}
+
+% generic abbreviation 
+\begin{zed}
+    GenAbbr[T] == GenSch[T]
+\end{zed}
+
+% generic abbreviation 
+\begin{zed}
+    GenAbbrInst == GenAbbr[0 \upto 3]
+\end{zed}
+
+% generic horizontal schema
+\begin{zed}
+  Unit[X] == [~ a\_1~, a\_2: \nat; st: X | a\_1 \leq a\_2 ~]
+\end{zed}
+
+\begin{zed}
+    SState ::= sokay | sfailed  \\
+\end{zed}
+
+% instantiation of generic horizontal schema
+\begin{zed}
+  QSensor == Unit[SState][qa\_1~/a\_1~, qa\_2~/a\_2~, qst/st]
+\end{zed}
+
+\begin{circus}
+    \circchannel\ clocktick, startcycle \\
+    % generic channel declaration
+    \circchannel [X] gin, gout: X \cross X  \\
+    % generic channel set declaration 
+    \circchannelset [X] gchnset == \lchanset gin[\nat], gout[\nat] \rchanset 
+\end{circus}
+
+\begin{circus}
+   \circprocess\ Timer ~\circdef~ \circbegin \\
+     \t1 cycletime == 5 \\ %
+     \t1 cyclelimit == cycletime - 1 \\ %
+     \t1 Time == 0 \upto cyclelimit \\
+     \t1 \circstate\ TimeState == [~ time: Time ~] \\ %
+     \t1 TimeOp == [~ \Delta TimeState | time' \geq time ~] \\
+     % generic horizontal schema within a process
+     \t1 Test[X] == [~ a\_1~, a\_2: \nat; st: X | a\_1 \leq a\_2 ~] \\
+     % instantiation
+     \t1 Test1 == Test[Time] \\
+     % instantiation of generic axiomatic defintion
+     \t1 Test2 == [~ a: S[Time, Time]; b: T[Time, Time] | true ~] \\
+     \t1 TCycle \circdef (~time := time + 1 \mod cycletime ~) \circseq \\ %
+            \t3 (\circif\ time = 0 \circthen startcycle \then \Skip\ \circelse\ time \neq 0 \circthen \Skip\ \circfi) \circseq \\ %
+            \t3 clocktick \then TCycle \\
+     \t1 \circspot time := cyclelimit \circseq TCycle \circseq gin[\nat]?x \then \Skip \\
+   \circend
+\end{circus}
+
+% Generic process
+\begin{circus}
+    \circprocess\ [X] GProc \circdef \circbegin \\ 
+    \t1 \circstate\ State == [~ s:\power~X | \#~s < 5 ~] \\
+    \t1 Init == [~ State~' | s' = \emptyset ~] \\
+    \t1 \circspot \Skip \\
+    \circend
+\end{circus}
+
+\begin{circus}
+    % instantiation of generic process
+    \circprocess\ GProcIns \circdef GProc[\nat] \circseq GProc[\nat_1] \\
+\end{circus}

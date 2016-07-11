@@ -1,0 +1,1090 @@
+% Encoding: ISO-8859-1
+
+@InProceedings{Oelveczky1995,
+  author =    {Peter Csaba {\"{O}}lveczky and Piotr Kosiuczenko and Martin Wirsing},
+  title =     {{A}n {O}bject-{O}riented {A}lgebraic {S}team-{B}oiler {C}ontrol {S}pecification},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {379--402},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/OveczkyKW95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027246},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:06 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027246}
+}
+
+@InProceedings{Abrial1995,
+  author =    {Jean-Raymond Abrial},
+  title =     {{S}team-{B}oiler {C}ontrol {S}pecification {P}roblem},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {500--509},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/Abrial95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027252},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:06 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027252}
+}
+
+@InProceedings{Abrial1995a,
+  author =    {Jean-Raymond Abrial and Egon B{\"{o}}rger and Hans Langmaack},
+  title =     {{T}he {S}tream {B}oiler {C}ase {S}tudy: {C}ompetition of {F}ormal {P}rogram {S}pecification and {D}evelopment {M}ethods},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {1--12},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/AbrialBL95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027228},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:05 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027228}
+}
+
+@InProceedings{Buessow1995,
+  author =    {Robert B{\"{u}}ssow and Matthias Weber},
+  title =     {{A} {S}team-{B}oiler {C}ontrol {S}pecification with {S}tatecharts and {Z}},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {109--128},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/BussowW95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027233},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:05 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027233}
+}
+@InProceedings{	  beg2010,
+  title		= {{L}inking a state-rich process algebra to a state-free
+		  algebra to verify software/hardware implementation},
+  author	= {Arshad Beg and Andrew Butterfield},
+  booktitle	= {FIT},
+  year		= {2010},
+  pages		= {47},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  crossref	= {DBLP:conf/fit/2010},
+  ee		= {http://doi.acm.org/10.1145/1943628.1943675},
+  owner		= {ykf_2001},
+  timestamp	= {2013.06.10}
+}
+
+@InProceedings{Beierle1995,
+  author =    {Christoph Beierle and Egon B{\"{o}}rger and Igor Durdanovic and Uwe Gl{\"{a}}sser and Elvinia Riccobene},
+  title =     {{R}efining {A}bstract {M}achine {S}pecifications of the {S}team {B}oiler {C}ontrol to {W}ell {D}ocumented {E}xecutable {C}ode},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {52--78},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/BeierleBDGR95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027231},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:05 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027231}
+}
+
+@InProceedings{Bidoit1995,
+  author =    {Michel Bidoit and Claude Chevenier and Christine Pellen and J{\'{e}}r{\^{o}}me Ryckbosch},
+  title =     {{A}n {A}lgebraic {S}pecification of the {S}team-{B}oiler {C}ontrol {S}ystem},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {79--108},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/BidoitCPR95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027232},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:05 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027232}
+}
+
+@InProceedings{	  carrington1989,
+  title		= {{O}bject-{Z}: {A}n {O}bject-{O}riented {E}xtension to
+		  {Z}},
+  author	= {David A. Carrington and David J. Duke and Roger Duke and
+		  Paul King and Gordon A. Rose and Graeme Smith},
+  booktitle	= {FORTE},
+  year		= {1989},
+  pages		= {281-296},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  crossref	= {DBLP:conf/forte/1989},
+  owner		= {ykf_2001},
+  timestamp	= {2013.10.11}
+}
+
+@InProceedings{	  cavalcanti2004,
+  title		= {{A} {T}utorial {I}ntroduction to {CSP} in {\it Unifying
+		  Theories of Programming}},
+  author	= {Ana Cavalcanti and Jim Woodcock},
+  booktitle	= {PSSE},
+  year		= {2004},
+  pages		= {220-268},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  crossref	= {DBLP:conf/psse/2004},
+  ee		= {http://dx.doi.org/10.1007/11889229_6},
+  owner		= {ykf_2001},
+  timestamp	= {2013.01.02}
+}
+
+@InProceedings{	  fischer1998,
+  title		= {{H}ow to {C}ombine {Z} with {P}rocess {A}lgebra},
+  author	= {Clemens Fischer},
+  booktitle	= {ZUM},
+  year		= {1998},
+  pages		= {5-23},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  crossref	= {DBLP:conf/zum/1998},
+  ee		= {http://dx.doi.org/10.1007/978-3-540-49676-2_2},
+  owner		= {ykf_2001},
+  timestamp	= {2013.10.11}
+}
+
+@InProceedings{Freitas2006a,
+  author =    {Angela Freitas and Ana Cavalcanti},
+  title =     {{A}utomatic {T}ranslation from {C}ircus to {J}ava},
+  booktitle = {FM},
+  year =      {2006},
+  pages =     {115-130},
+  bibsource = {DBLP, http://dblp.uni-trier.de},
+  crossref =  {DBLP:conf/fm/2006},
+  ee =        {http://dx.doi.org/10.1007/11813040_9},
+  owner =     {randall},
+  timestamp = {2013.07.16}
+}
+
+@InProceedings{Gaudel1995,
+  author =    {Marie{-}Claude Gaudel and Pierre Dauchy and Carole Khoury},
+  title =     {{A} {F}ormal {S}pecification of the {S}team-{B}oiler {C}ontrol {P}roblem by {A}lgebraic {S}pecifications with {I}mplicit {S}tate},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {233--264},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/GaudelDK95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027240},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:05 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027240}
+}
+
+@InProceedings{Henzinger1995,
+  author =    {Thomas A. Henzinger and Howard Wong{-}Toi},
+  title =     {{U}sing {H}y{T}ech to {S}ynthesize {C}ontrol {P}arameters for a {S}team {B}oiler},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {265--282},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/HenzingerW95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027241},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:05 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027241}
+}
+
+@InProceedings{Lesske1995,
+  author =    {Frank Lesske and Stephan Merz},
+  title =     {{S}team {B}oiler {C}ontrol {S}pecification {P}roblem: {A} {TLA} {S}olution},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {339--358},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/LesskeM95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027244},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:06 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027244}
+}
+
+@InProceedings{	  leuschel2005,
+  title		= {{A}utomatic {R}efinement {C}hecking for {B}},
+  author	= {Michael Leuschel and Michael J. Butler},
+  booktitle	= {ICFEM},
+  year		= {2005},
+  pages		= {345-359},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  crossref	= {DBLP:conf/icfem/2005},
+  ee		= {http://dx.doi.org/10.1007/11576280_24},
+  file		= {2005 Automatic Refinement Checking for
+		  B.pdf:ProB/publications/2005 Automatic Refinement Checking
+		  for B.pdf:PDF},
+  owner		= {ykf_2001},
+  timestamp	= {2013.06.26}
+}
+
+@InProceedings{Leuschel2007,
+  author =    {Michael Leuschel and Michael J. Butler and Corinna Spermann and Edd Turner},
+  title =     {{S}ymmetry {R}eduction for {B} by {P}ermutation {F}looding},
+  booktitle = {B},
+  year =      {2007},
+  pages =     {79-93},
+  bibsource = {DBLP, http://dblp.uni-trier.de},
+  crossref =  {DBLP:conf/b/2007},
+  ee =        {http://dx.doi.org/10.1007/11955757_9},
+  file =      {:ProB/publications/2006 Symmetry Reduction in the ProB Model Checker.pdf:PDF},
+  owner =     {randall},
+  timestamp = {2012.12.10}
+}
+
+@InProceedings{Malik2005,
+  author =    {Petra Malik and Mark Utting},
+  title =     {{CZT}: {A} {F}ramework for {Z} {T}ools},
+  booktitle = {ZB},
+  year =      {2005},
+  pages =     {65-84},
+  bibsource = {DBLP, http://dblp.uni-trier.de},
+  crossref =  {DBLP:conf/zum/2005},
+  ee =        {http://dx.doi.org/10.1007/11415787_5},
+  file =      {:./Z/Tools/CZT/2005 CZT A Framework for Z Tools.pdf:PDF},
+  keywords =  {CZT},
+  owner =     {randall},
+  timestamp = {2013.06.18}
+}
+
+@InProceedings{Schinagl1995,
+  author =    {Christian P. Schinagl},
+  title =     {{VDM} {S}pecification of the {S}team-{B}oiler {C}ontrol {U}sing {RSL} {N}otation},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {428--452},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/Schinagl95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027248},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:06 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027248}
+}
+
+@InProceedings{Vitt1995,
+  author =    {Jan Vitt and Jozef Hooman},
+  title =     {{A}ssertional {S}pecification and {V}erification {U}sing {PVS} of the {S}team {B}oiler {C}ontrol {S}ystem},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {453--472},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/VittH95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027249},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:06 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027249}
+}
+
+@InProceedings{	  welch2000,
+  title		= {{P}rocess {O}riented {D}esign for {J}ava: {C}oncurrency
+		  for {A}ll},
+  author	= {Peter H. Welch},
+  booktitle	= {PDPTA},
+  year		= {2000},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  crossref	= {DBLP:conf/pdpta/2000},
+  owner		= {randall},
+  timestamp	= {2013.10.08}
+}
+
+@InProceedings{Willig1995,
+  author =    {Andreas Willig and Ina Schieferdecker},
+  title =     {{S}pecifying and {V}erifying the {S}team-{B}oiler {C}ontrol {S}ystem with {T}ime {E}xtended {LOTOS}},
+  booktitle = {Formal Methods for Industrial Applications, Specifying and Programming the Steam Boiler Control (the book grow out of a Dagstuhl Seminar, June 1995).},
+  year =      {1995},
+  pages =     {473--492},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/WilligS95},
+  crossref =  {DBLP:conf/dagstuhl/1995fm},
+  doi =       {10.1007/BFb0027250},
+  owner =     {ykf_2001},
+  timestamp = {Mon, 27 Jun 2011 15:26:06 +0200},
+  url =       {http://dx.doi.org/10.1007/BFb0027250}
+}
+
+@InProceedings{Woodcock2001,
+  author =        {Jim Woodcock and Ana Cavalcanti},
+  title =         {{T}he {S}team {B}oiler in a {U}nified {T}heory of {Z} and {CSP}},
+  booktitle =     {8th Asia-Pacific Software Engineering Conference {(APSEC} 2001), 4-7 December 2001, Macau, China},
+  year =          {2001},
+  pages =         {291--298},
+  __markedentry = {[ykf_2001:]},
+  bibsource =     {dblp computer science bibliography, http://dblp.org},
+  biburl =        {http://dblp.uni-trier.de/rec/bib/conf/apsec/WoodcockC01},
+  crossref =      {DBLP:conf/apsec/2001},
+  doi =           {10.1109/APSEC.2001.991490},
+  owner =         {ykf_2001},
+  timestamp =     {Tue, 25 Nov 2014 17:05:18 +0100},
+  url =           {http://dx.doi.org/10.1109/APSEC.2001.991490}
+}
+
+@InProceedings{	  woodcock2002,
+  title		= {{T}he {S}emantics of {C}ircus},
+  author	= {Jim Woodcock and Ana Cavalcanti},
+  booktitle	= {ZB},
+  year		= {2002},
+  pages		= {184-203},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  crossref	= {DBLP:conf/zum/2002},
+  ee		= {http://dx.doi.org/10.1007/3-540-45648-1_10},
+  file		= {2002 The Semantics of Circus.pdf:Circus\\2002 The
+		  Semantics of Circus.pdf:PDF;2003 Predicate Transformers in
+		  the Semantics of Circus.pdf:Circus\\2003 Predicate
+		  Transformers in the Semantics of Circus.pdf:PDF},
+  owner		= {ykf_2001},
+  timestamp	= {2013.01.02}
+}
+
+@InProceedings{	  woodcock2004,
+  title		= {{A} {T}utorial {I}ntroduction to {D}esigns in {U}nifying
+		  {T}heories of {P}rogramming},
+  author	= {Jim Woodcock and Ana Cavalcanti},
+  booktitle	= {IFM},
+  year		= {2004},
+  pages		= {40-66},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  crossref	= {DBLP:conf/ifm/2004},
+  ee		= {http://dx.doi.org/10.1007/978-3-540-24756-2_4},
+  owner		= {ykf_2001},
+  timestamp	= {2013.01.02}
+}
+
+@InProceedings{	  woodcock2005,
+  title		= {{O}perational {S}emantics for {M}odel {C}hecking
+		  {C}ircus},
+  author	= {Jim Woodcock and Ana Cavalcanti and Leonardo Freitas},
+  booktitle	= {FM},
+  year		= {2005},
+  pages		= {237-252},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  crossref	= {DBLP:conf/fm/2005},
+  ee		= {http://dx.doi.org/10.1007/11526841_17},
+  file		= {2005 Operational semantics for model checking
+		  Circus.pdf:Circus/2005 Operational semantics for model
+		  checking Circus.pdf:PDF},
+  owner		= {ykf_2001},
+  timestamp	= {2013.03.10}
+}
+
+@Book{		  abrial2005,
+  title		= {{T}he {B}-book: assigning programs to meanings},
+  author	= {Jean-Raymond Abrial},
+  publisher	= {Cambridge University Press},
+  year		= {2005},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  isbn		= {978-0-521-02175-3},
+  owner		= {randall},
+  pages		= {I-XXXIV, 1-779},
+  timestamp	= {2012.12.14}
+}
+
+@Book{		  abrial2010,
+  title		= {{M}odeling in {E}vent-{B}: {S}ystem and {S}oftware
+		  {E}ngineering},
+  author	= {Jean-Raymond Abrial},
+  publisher	= {Cambridge University Press},
+  year		= {2010},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  isbn		= {978-0-521-89556-9},
+  owner		= {randall},
+  pages		= {I-XXVI, 1-586},
+  timestamp	= {2012.12.14}
+}
+
+@Book{Bauer1993,
+  title =     {{S}pecification for a software program for a boiler water content monitor and control system},
+  publisher = {University of Waterloo, Institute of Risk Research},
+  year =      {1993},
+  author =    {J. C. Bauer},
+  owner =     {ykf_2001},
+  timestamp = {2016.02.10}
+}
+
+@Article{	  bergstra1984,
+  title		= {{P}rocess {A}lgebra for {S}ynchronous {C}ommunication},
+  author	= {Jan A. Bergstra and Jan Willem Klop},
+  journal	= {Information and Control},
+  year		= {1984},
+  number	= {1-3},
+  pages		= {109-137},
+  volume	= {60},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  ee		= {http://dx.doi.org/10.1016/S0019-9958(84)80025-X},
+  owner		= {randall},
+  timestamp	= {2013.07.17}
+}
+
+@Article{	  butler2005,
+  title		= {{C}ombining {CSP} and {B} for {S}pecification and
+		  {P}roperty {V}erification},
+  author	= {Michael Butler and Michael Leuschel},
+  year		= {2005},
+  pages		= {221--236},
+  abstract	= {{A}bstract. {P}ro{B} is a model checking tool for the {B}
+		  {M}ethod. {I}n this paper we present an extension of
+		  {P}ro{B} that supports checking of spec- ifications written
+		  in a combination of {CSP} and {B}. {W}e explain how the
+		  notations are combined semantically and give an overview of
+		  the implementation of the combination. {W}e illustrate the
+		  benefit that appropriate use of {CSP}, in conjunction with
+		  our tool, gives to {B} developments both for specification
+		  and for verification purposes.},
+  booktitle	= {In Proceedings of Formal Methods 2005 (in press),
+		  Newcastle upon},
+  file		= {2005 Combining CSP and B for Specification and Property
+		  Verification.pdf:ProB/publications/2005 Combining CSP and B
+		  for Specification and Property Verification.pdf:PDF},
+  publisher	= {Springer},
+  review	= {CSP and B with ProB 1) Operations of a machine are
+		  specified as generalised substitutions, which allow
+		  deterministic and nondeterministic state transitions to be
+		  specified. 2) There are two main proof activities in B:
+		  consistency checking and refinement check (Atelier B and
+		  B-Toolkit). ProB more focuses on consistency checking,
+		  though it can support refinement check of B 3) ProB tool
+		  supports automated consistency checking of B machines via
+		  model checking 4) while B machines are good at modelling
+		  parallel activity, they can be less convenient at modelling
+		  sequential activity. This can be a lot less transparent
+		  than the way in which one orders action execution in
+		  process algebras such as CSP 5) This paper is to use CSP
+		  and B together in a complementary way.
+		  
+		  B can be used to specify abstract state and can be used to
+		  specify operations of a system in terms of their enabling
+		  conditions and effect on the abstract state. CSP can be
+		  used to give an overall specification of the coordination
+		  of operations. The execution of an operation in a B machine
+		  corresponds to an event in CSP terms. Semantically view B
+		  machine as a process that can engage in events in the same
+		  way that a CSP process can. The meaning of a combined CSP
+		  and B specification is the parallel composition of both
+		  specifications.
+		  
+		  The B machine and the CSP process must synchronise on
+		  common events, that is, an operation can only happen in the
+		  combined system when it is allowed both by the B and the
+		  CSP. 6) CSP Intepreter and Animator (Design and
+		  Implementation of the High-Level Specification Language
+		  CSP(LP) in Prolog) + ProB together to animate and model
+		  check the combination of CSP and B together. They are both
+		  implemented with Prolog 7) Two main uses of combined CSP
+		  and B tools (CIA and ProB): animate and model check
+		  specifications which are a combination of B and CSP analyse
+		  trace properties of a B machine. CSP to specify some
+		  desirable or undesirable behaviours and use ProB to find
+		  traces of the B machine that exhibit those behaviours 8)
+		  Combination of B and CSP Combining State Information
+		  Mapping Operations to Channels Deriving an Operational
+		  Semantics Computing the Operational Semantics 9) Specifying
+		  using B and CSP, and Verifying properties of B machines
+		  using CSP: CSP to specify some desirable or undesirable
+		  behaviours and use ProB to find traces of the B machine
+		  that exhibit those behaviours. 10) Related works a. CSP2B
+		  tool: specifications to be written in a combination of CSP
+		  and B by compiling the CSP to a pure B representation which
+		  can be analysed by a standard B tool. The CSP support by
+		  csp2B is more restricted than that supported by ProB: csp2B
+		  does not support internal choice and allows parallel
+		  composition only at the outermost level unlike the
+		  arbitrary combination of CSP operators supported by ProB b.
+		  CSP||B: is focused on a style of combining CSP and B where
+		  the B machines are passive and all the coordination is
+		  provided by the CSP. This means the operations of their B
+		  machines cannot be guarded though they can have
+		  preconditions. c. CSP-OZ, (Object Z and CSP): treat Z
+		  specifications as CSP processes and model the composition
+		  of the CSP and Z parts as parallel composition. Like the
+		  approach described in this paper d. Model check CSP-Z: an
+		  approach to translating Z to CSP so that CSP-Z
+		  specifications can be model checked. e. Circus language: is
+		  a rich combination of Z and CSP allowing Z to be easily
+		  embedded in CSP specifications and providing refinement
+		  rules for development 11) ProB also supports refinement
+		  checking between B models and between combinations of CSP
+		  and B.}
+}
+
+@Book{		  carlsson2012,
+  title		= {{S}icstus {PROLOG} {U}ser's {M}anual 4.2},
+  author	= {Carlsson, Mats},
+  publisher	= {Books On Demand - Proquest},
+  year		= {2012},
+  isbn		= {3735737447, 9783735737441}
+}
+
+@Article{	  cavalcanti2003a,
+  title		= {{A} {R}efinement {S}trategy for {C}ircus},
+  author	= {Ana Cavalcanti and Augusto Sampaio and Jim Woodcock},
+  journal	= {Formal Asp. Comput.},
+  year		= {2003},
+  number	= {2-3},
+  pages		= {146-181},
+  volume	= {15},
+  abstract	= {{A}bstract. {W}e present a reﬁnement strategy for
+		  {C}ircus, which is the combination of {Z}, {CSP}, and the
+		  reﬁnement calculus in the setting of {H}oare & {H}e’s
+		  unifying theories of programming. {T}he strategy uniﬁes
+		  the theories of reﬁnement for processes and their
+		  constituent actions, and provides a coherent technique for
+		  the stepwise reﬁnement of concurrent and distributed
+		  programs involving rich data structures. {T}his kind of
+		  development is carried out using {C}ircus’s reﬁnement
+		  calculus, and we describe some of its laws for the
+		  simultaneous reﬁnement of state and control behaviour,
+		  including the splitting of a process into parallel
+		  subcomponents. {W}e illustrate the strategy and the laws
+		  using a case study that shows the complete development of a
+		  small distributed program.},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  ee		= {http://dx.doi.org/10.1007/s00165-003-0006-5},
+  file		= {2003 A Refinement Strategy for Circus.pdf:Circus\\2003 A
+		  Refinement Strategy for Circus.pdf:PDF},
+  owner		= {ykf_2001},
+  review	= {1. Data refinement
+		  
+		  A data simulation is a relation between an abstract data
+		  space and a concrete counterpart. Data simulations 1
+		  underly two reﬁnement techniques which enable us to
+		  verify data reﬁnement: forwards refinement and backwards
+		  refinement also known as downward and upward simulations},
+  timestamp	= {2013.03.10}
+}
+
+@Book{		  clarke1999,
+  title		= {{M}odel checking},
+  author	= {Clarke,Jr., Edmund M. and Grumberg, Orna and Peled, Doron
+		  A.},
+  publisher	= {MIT Press},
+  year		= {1999},
+  address	= {Cambridge, MA, USA},
+  isbn		= {0-262-03270-8}
+}
+
+@Electronic{	  clearsy-b-ref,
+  title		= {{B} {LANGUAGE} {REFERENCE} {MANUAL} ({V}ersion 1.8.6)},
+  author	= {Clearsy},
+  url		= {http://www.atelierb.eu/ressources/manrefb1.8.6.uk.pdf},
+  owner		= {ykf_2001},
+  timestamp	= {2013.06.27}
+}
+
+@Book{		  dijkstra1976,
+  title		= {{A} {D}iscipline of {P}rogramming},
+  author	= {Edsger W. Dijkstra},
+  publisher	= {Prentice-Hall},
+  year		= {1976},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  owner		= {randall},
+  timestamp	= {2013.05.13}
+}
+
+@Article{Dobrikov2014,
+  author =        {Dobrikov, Ivaylo and Leuschel, Michael},
+  title =         {{O}ptimising the {P}ro{B} {M}odel {C}hecker for {B} {U}sing {P}artial {O}rder {R}eduction},
+  journal =       {Software Engineering and Formal Methods},
+  year =          {2014},
+  month =         jan,
+  __markedentry = {[ykf_2001:6]},
+  date =          {2014-01-01},
+  doi =           {10.1007/978-3-319-10431-7_16},
+  owner =         {ykf_2001},
+  publisher =     {Springer},
+  timestamp =     {2016.02.28},
+  url =           {http://dx.doi.org/10.1007/978-3-319-10431-7_16}
+}
+
+@Article{Dobrikov2016,
+  author =        {Dobrikov, Ivaylo and Leuschel, Michael},
+  title =         {{O}ptimising the {P}ro{B} model checker for {B} using partial order reduction},
+  journal =       {Formal Aspects of Computing},
+  year =          {2016},
+  pages =         {1},
+  month =         jan,
+  __markedentry = {[ykf_2001:6]},
+  date =          {2016-01-15},
+  doi =           {10.1007/s00165-015-0351-1},
+  issn =          {1433-299X},
+  owner =         {ykf_2001},
+  publisher =     {Springer},
+  timestamp =     {2016.02.28},
+  url =           {http://dx.doi.org/10.1007/s00165-015-0351-1}
+}
+
+@Electronic{	  epv10,
+  title		= {{E}clipse {P}ublic {L}icense - v 1.0},
+  author	= {Eclipse},
+  url		= {http://www.eclipse.org/org/documents/epl-v10.html},
+  owner		= {ykf_2001},
+  timestamp	= {2014.12.30}
+}
+
+@InBook{fischer1997a,
+  title =     {{CSP}-{OZ}: {A} {C}ombination of {O}bject-{Z} and {CSP}},
+  year =      {1997},
+  author =    {Fischer, Clemens},
+  abstract =  {{I}n this paper we define a combination of {O}bject-{Z}
+		  and {CSP} called {CSP}-{OZ}. {T}he basic idea is to define
+		  a {CSP}-semantics for every {O}bject-{Z} class. {S}pecial
+		  care is taken to capture the characteristics of input and
+		  output parameters properly and to preserve the expected
+		  refinement rules. {CSP}-{OZ} is well suited for the
+		  specification and development of communicating distributed
+		  systems. {I}t provides powerful techniques to model data-
+		  and control-aspects in a common framework. {T}he language
+		  is easy to use for {Z} and {O}bject-{Z} users. {A} shorter
+		  version of this paper appeared as [10]. },
+  owner =     {randall},
+  timestamp = {2013.07.17}
+}
+
+@PhDThesis{	  freitas2005,
+  title		= {{M}odel {C}hecking {C}ircus},
+  author	= {Freitas, Leonardo},
+  year		= {2005},
+  institution	= {University of York},
+  owner		= {ykf_2001},
+  priority	= {2},
+  timestamp	= {2013.04.03}
+}
+
+@TechReport{Freitas2006,
+  author =      {Leonardo Freitas},
+  title =       {{C}ircus {E}xample - {P}arsable {S}team {B}oiler},
+  institution = {Academia.edu},
+  year =        {2006},
+  owner =       {ykf_2001},
+  timestamp =   {2016.02.11}
+}
+
+@InProceedings{	  galloway1997,
+  title		= {{A}n {O}perational {S}emantics for {ZCCS}},
+  author	= {Andy Galloway and Bill Stoddart},
+  booktitle	= {ICFEM},
+  year		= {1997},
+  pages		= {272-},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  owner		= {ykf_2001},
+  timestamp	= {2013.01.01}
+}
+
+@Book{		  hoare1985,
+  title		= {{C}ommunicating {S}equential {P}rocesses},
+  author	= {C. A. R. Hoare},
+  publisher	= {Prentice-Hall},
+  year		= {1985},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  isbn		= {0-13-153271-5},
+  owner		= {ykf_2001},
+  timestamp	= {2012.12.27}
+}
+
+@Book{		  hoare1998,
+  title		= {{U}nifying theories of programming},
+  author	= {Hoare, C.A.R. and He, J.},
+  publisher	= {Prentice Hall},
+  year		= {1998},
+  volume	= {14},
+  added-at	= {2010-12-02T22:49:11.000+0100},
+  biburl	= {http://www.bibsonomy.org/bibtex/295f3e2b2a295587eef693cf51ea42254/tasawer}
+		  ,
+  interhash	= {e4be0af098d6012a98ba7a1ed14829bc},
+  intrahash	= {95f3e2b2a295587eef693cf51ea42254},
+  owner		= {ykf_2001},
+  timestamp	= {2013.01.02}
+}
+
+@Book{		  jones1991,
+  title		= {{S}ystematic software development using {VDM} (2. ed.)},
+  author	= {Clifford B. Jones},
+  publisher	= {Prentice Hall},
+  year		= {1991},
+  series	= {Prentice Hall International Series in Computer Science},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  file		= {:../../References/VDM/misc/Systematic Software Development
+		  using VDM.pdf:PDF},
+  isbn		= {978-0-13-880733-7},
+  keywords	= {VDM},
+  owner		= {ykf_2001},
+  pages		= {I-XIV, 1-333},
+  timestamp	= {2012.12.31}
+}
+
+@Book{		  lamport2002a,
+  title		= {{S}pecifying {S}ystems, {T}he {TLA}+ {L}anguage and
+		  {T}ools for {H}ardware and {S}oftware {E}ngineers},
+  author	= {Leslie Lamport},
+  publisher	= {Addison-Wesley},
+  year		= {2002},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  isbn		= {0-3211-4306-X},
+  owner		= {ykf_2001},
+  timestamp	= {2013.01.06}
+}
+
+@PhDThesis{	  lazic1999,
+  title		= {{A Semantic Study of Data Independence with Application to
+		  Model Checking}},
+  author	= {Lazic, Ranko},
+  year		= {1999},
+  citeulike-article-id={11560189},
+  citeulike-linkout-0={http://citeseer.uark.edu:8080/citeseerx/showciting;jsessionid=344C8C9F9CE25F2A4FE75DDD6362C072?cid=96955\&\#38;sort=recent}
+		  ,
+  comment	= {paper\_depo/thes\_corr.pdf},
+  institution	= {Oxford University Computing Laboratory},
+  keywords	= {model\_checking, thesis},
+  posted-at	= {2012-10-27 01:23:53},
+  url		= {http://citeseer.uark.edu:8080/citeseerx/showciting;jsessionid=344C8C9F9CE25F2A4FE75DDD6362C072?cid=96955\&\#38;sort=recent}
+		  
+}
+
+@Misc{		  leijen2001,
+  title		= {{D}ivision and {M}odulus for {C}omputer {S}cientists},
+  author	= {Daan Leijen},
+  year		= {2001}
+}
+
+@TechReport{	  oliveira2013,
+  title		= {{C}ompositional {A}nalysis and {D}esign of {CML}
+		  {M}odels},
+  author	= {Marcel Oliveira, Augusto Sampaio, Pedro Antonino, Rodrigo
+		  Ramos, Ana Cavalcanti, Jim Woodcock},
+  year		= {2013},
+  month		= {March},
+  number	= {D24.1},
+  type		= {COMPASS Deliverable},
+  owner		= {randall},
+  timestamp	= {2013.10.08}
+}
+
+@Book{		  milner1980,
+  title		= {{A} {C}alculus of {C}ommunicating {S}ystems},
+  author	= {Robin Milner},
+  publisher	= {Springer},
+  year		= {1980},
+  series	= {Lecture Notes in Computer Science},
+  volume	= {92},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  ee		= {http://dx.doi.org/10.1007/3-540-10235-3},
+  isbn		= {3-540-10235-3},
+  owner		= {randall},
+  timestamp	= {2013.07.17}
+}
+
+@Book{		  morgan1994,
+  title		= {{P}rogramming from specifications, 2nd {E}dition},
+  author	= {Carroll C. Morgan},
+  publisher	= {Prentice Hall},
+  year		= {1994},
+  series	= {Prentice Hall International series in computer science},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  isbn		= {978-0-13-123274-7},
+  owner		= {randall},
+  pages		= {I-XV, 1-332},
+  timestamp	= {2013.05.13}
+}
+
+@InProceedings{	  mota1998,
+  title		= {{M}odel-{C}hecking {CSP}-{Z}},
+  author	= {Alexandre Mota and Augusto Sampaio},
+  booktitle	= {FASE},
+  year		= {1998},
+  pages		= {205-220},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  ee		= {http://dx.doi.org/10.1007/BFb0053592},
+  owner		= {ykf_2001},
+  timestamp	= {2013.10.11}
+}
+
+@Article{	  nogueira2012,
+  title		= {{T}est generation from state based use case models},
+  author	= {Nogueira, Sidney and Sampaio, Augusto and Mota,
+		  Alexandre},
+  journal	= {Formal Aspects of Computing},
+  year		= {2012},
+  pages		= {1-50},
+  doi		= {10.1007/s00165-012-0258-z},
+  issn		= {0934-5043},
+  keywords	= {Natural language; Test model; Use cases; CSP; Test
+		  generation; Conformance testing},
+  language	= {English},
+  publisher	= {Springer-Verlag},
+  url		= {http://dx.doi.org/10.1007/s00165-012-0258-z}
+}
+
+@Article{	  oliveira2005,
+  title		= {{F}ormal {D}evelopment of {I}ndustrial-{S}cale {S}ystems
+		  in {C}ircus},
+  author	= {Marcel Oliveira and Ana Cavalcanti and Jim Woodcock},
+  journal	= {ISSE},
+  year		= {2005},
+  number	= {2},
+  pages		= {125-146},
+  volume	= {1},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  ee		= {http://dx.doi.org/10.1007/s11334-005-0014-0},
+  file		= {:Circus\\2005 Formal development of industrial-scale
+		  systems.pdf:PDF},
+  owner		= {ykf_2001},
+  timestamp	= {2013.03.10}
+}
+
+@Article{	  oliveira2007,
+  title		= {{A} {D}enotational {S}emantics for {C}ircus},
+  author	= {Marcel Oliveira and Ana Cavalcanti and Jim Woodcock},
+  journal	= {Electr. Notes Theor. Comput. Sci.},
+  year		= {2007},
+  pages		= {107-123},
+  volume	= {187},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  ee		= {http://dx.doi.org/10.1016/j.entcs.2006.08.047},
+  file		= {:../../References/Circus/2006 A denotational semantics for
+		  Circus.pdf:PDF},
+  owner		= {ykf_2001},
+  timestamp	= {2013.03.10}
+}
+
+@Article{	  oliveira2009,
+  title		= {{A} {UTP} {S}emantics for {C}ircus},
+  author	= {Marcel Oliveira and Ana Cavalcanti and Jim Woodcock},
+  journal	= {Formal Asp. Comput.},
+  year		= {2009},
+  number	= {1-2},
+  pages		= {3-32},
+  volume	= {21},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  ee		= {http://dx.doi.org/10.1007/s00165-007-0052-5},
+  file		= {:../../References/Circus/2009 A UTP semantics for
+		  Circus.pdf:PDF},
+  owner		= {ykf_2001},
+  timestamp	= {2013.03.10}
+}
+
+@InCollection{	  oliveira2014,
+  title		= {{M}odel-{C}hecking {C}ircus {S}tate-{R}ich
+		  {S}pecifications},
+  author	= {Oliveira, MarcelViniciusMedeiros and Sampaio, AugustoC.A.
+		  and Conserva Filho, MadielS.},
+  booktitle	= {Integrated Formal Methods},
+  publisher	= {Springer International Publishing},
+  year		= {2014},
+  editor	= {Albert, Elvira and Sekerinski, Emil},
+  pages		= {39-54},
+  series	= {Lecture Notes in Computer Science},
+  doi		= {10.1007/978-3-319-10181-1_3},
+  isbn		= {978-3-319-10180-4},
+  keywords	= {Formal methods integration; Model-checking; Circus; CSP},
+  language	= {English},
+  url		= {http://dx.doi.org/10.1007/978-3-319-10181-1_3}
+}
+
+@PhdThesis{oliveira2005a,
+  author =    {Oliveira, Marcel V.},
+  title =     {{F}ormal {D}erivation of {S}tate-{R}ich {R}eactive {P}rograms using {C}ircus},
+  school =    {University of York},
+  year =      {2005},
+  file =      {:../..//References/Circus/2006 Formal Derivation of
+		  State-Rich Reactive Programs using Circus.pdf:PDF},
+  keywords =  {circus, formal, methods, processes, reactive, state-rich, utp},
+  posted-at = {2012-03-15 13:24:57}
+}
+
+@InCollection{	  plagge2007,
+  title		= {{V}alidating {Z} {S}pecifications {U}sing the {P}ro{B}
+		  {A}nimator and {M}odel {C}hecker},
+  author	= {Plagge, Daniel and Leuschel, Michael},
+  booktitle	= {Integrated Formal Methods},
+  publisher	= {Springer Berlin Heidelberg},
+  year		= {2007},
+  editor	= {Davies, Jim and Gibbons, Jeremy},
+  pages		= {480-500},
+  series	= {Lecture Notes in Computer Science},
+  volume	= {4591},
+  doi		= {10.1007/978-3-540-73210-5_25},
+  isbn		= {978-3-540-73209-9},
+  language	= {English},
+  url		= {http://dx.doi.org/10.1007/978-3-540-73210-5_25}
+}
+
+@Book{		  roscoe2010,
+  title		= {{U}nderstanding {C}oncurrent {S}ystems},
+  author	= {Roscoe, A.W.},
+  publisher	= {Springer-Verlag New York, Inc.},
+  year		= {2010},
+  address	= {New York, NY, USA},
+  edition	= {1st},
+  file		= {:../../References/CSP/Understanding Concurrent
+		  Systems/Understanding+Concurrent+Systems.pdf:PDF},
+  isbn		= {184882257X, 9781848822573}
+}
+
+@Book{		  roscoe1997,
+  title		= {{T}he {T}heory and {P}ractice of {C}oncurrency},
+  author	= {Roscoe, A. W. and Hoare, C. A. R. and Bird, Richard},
+  publisher	= {Prentice Hall PTR},
+  year		= {1997},
+  address	= {Upper Saddle River, NJ, USA},
+  isbn		= {0136744095}
+}
+
+@Article{	  roscoe1996,
+  title		= {{N}on-interference through {D}eterminism},
+  author	= {A. W. Roscoe and Jim Woodcock and L. Wulf},
+  journal	= {Journal of Computer Security},
+  year		= {1996},
+  number	= {1},
+  pages		= {27-54},
+  volume	= {4},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  ee		= {http://dx.doi.org/10.3233/JCS-1996-4103},
+  owner		= {ykf_2001},
+  timestamp	= {2013.10.11}
+}
+
+@PhdThesis{scattergood1998,
+  author =               {Scattergood, Bryan},
+  title =                {{T}he {S}emantics and {I}mplementation of {M}achine-{R}eadable {CSP}},
+  school =               {University of Oxford},
+  year =                 {1998},
+  citeulike-article-id = {4948045},
+  keywords =             {csp, model-check, pcom2},
+  posted-at =            {2009-06-24 22:28:39}
+}
+
+@Article{	  schneider2005,
+  title		= {{CSP} theorems for communicating {B} machines},
+  author	= {Steve Schneider and Helen Treharne},
+  journal	= {Formal Asp. Comput.},
+  year		= {2005},
+  number	= {4},
+  pages		= {390-422},
+  volume	= {17},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  ee		= {http://dx.doi.org/10.1007/s00165-005-0076-7},
+  file		= {:../../References/Formal Method/integrated formal
+		  methods/CSP parallel B/CSP Theorems for Communicating
+		  B.pdf:PDF},
+  owner		= {ykf_2001},
+  timestamp	= {2013.01.01}
+}
+
+@Book{		  spivey1992,
+  title		= {{Z} {N}otation: {A} {R}eference {M}anual (2. ed.)},
+  author	= {J. Michael Spivey},
+  publisher	= {Prentice Hall},
+  year		= {1992},
+  series	= {Prentice Hall International Series in Computer Science},
+  bibsource	= {DBLP, http://dblp.uni-trier.de},
+  isbn		= {978-0-13-978529-0},
+  owner		= {ykf_2001},
+  pages		= {I-XI, 1-158},
+  timestamp	= {2013.01.02}
+}
+
+@TechReport{Woodcock2001a,
+  author =      {Jim Woodcock},
+  title =       {{A} {C}ircus {S}team {B}oiler: using the unifying theory of {Z} and {CSP}},
+  institution = {Oxford University Computing Laborator},
+  year =        {2001},
+  owner =       {ykf_2001},
+  timestamp =   {2016.02.11}
+}
+
+@Article{woodcock07b,
+  author =               {Woodcock, Jim and Cavalcanti, Ana and Gaudel, Marie-Claude and Freitas, Leo},
+  title =                {{Operational Semantics for Circus}},
+  journal =              {Formal Aspects of Computing},
+  year =                 {2007},
+  abstract =             {{Circus is a combination of Z, CSP, and the refinement
+		  calculus, and is based on Hoare \& He's Unifying Theories
+		  of Programming. We follow their approach in defining an
+		  SOS-style operational semantics for the imperative and
+		  behavioural parts of Circus whose soundness is proved with
+		  respect to a denotational semantics. Our novelty lies in
+		  completing this work for an integrated language, combining
+		  the individual semantics. The soundness of each rule in our
+		  operational semantics depends on a particular algebraic
+		  law.}},
+  citeulike-article-id = {6457874},
+  citeulike-linkout-0 =  {https://www.cs.york.ac.uk/ftpdir/pub/leo/utp/journal-pub/circus-operational-semantics.pdf},
+  keywords =             {2007, circus, operational, semantics},
+  posted-at =            {2009-12-29 18:17:29},
+  url =                  {https://www.cs.york.ac.uk/ftpdir/pub/leo/utp/journal-pub/circus-operational-semantics.pdf}
+}
+
+@Article{Ye2015,
+  author =   {Ye, Kangfeng and Woodcock, Jim},
+  title =    {{M}odel checking of state-rich formalism {\Circus} by linking to ${CSP}{\,} {\Vert}{\,} {B}$},
+  journal =  {International Journal on Software Tools for Technology Transfer},
+  year =     {2015},
+  pages =    {1--24},
+  abstract = {{S}ince state-rich formalism {\Circus} is a combination of {Z}, {CSP}, refinement calculus and {D}ijkstra's guarded commands, its model checking is intrinsically more complicated and difficult than that of individual state-based languages or process algebras. {C}urrent solutions translate executable constructs of {\Circus} programs to {J}ava with {JCSP}, or translate them to {CSP} processes. {D}ata aspects of {\Circus} programs are expressed in the {J}ava programming language or as {CSP} processes. {B}oth of them have disadvantages. {T}his work presents a new approach to model-checking {\Circus} by linking it to ${CSP} {\parallel} {B}$; then we utilise {P}ro{B} to model-check and animate the ${CSP} {\parallel} {B}$ program. {T}he most significant advantage of this approach is the direct mapping of the state part in {\Circus} to {Z} and finally to {B}, which maintains the high-level abstraction of data specification. {I}n addition, introduction of deadlock, invariant violation checking, {LTL} formula checking and animation is another key advantage. {W}e present our approach, a link definition for a subset of {\Circus} constructs, as well as a popular case study (reactive buffer) to show the practical usability of our work. {W}e conclude with a discussion of related work, advantages and potential limitations of our approach and future work.},
+  doi =      {10.1007/s10009-015-0402-1},
+  issn =     {1433-2787},
+  url =      {http://dx.doi.org/10.1007/s10009-015-0402-1}
+}
+
+@Proceedings{Abrial1996,
+  title =     {{F}ormal {M}ethods for {I}ndustrial {A}pplications, {S}pecifying and {P}rogramming the {S}team {B}oiler {C}ontrol (the book grow out of a {D}agstuhl {S}eminar, {J}une 1995)},
+  year =      {1996},
+  editor =    {Jean-Raymond Abrial and Egon B{\"{o}}rger and Hans Langmaack},
+  volume =    {1165},
+  series =    {Lecture Notes in Computer Science},
+  publisher = {Springer},
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  biburl =    {http://dblp.uni-trier.de/rec/bib/conf/dagstuhl/1995fm},
+  isbn =      {3-540-61929-1},
+  owner =     {ykf_2001},
+  timestamp = {Thu, 03 Jan 2002 11:56:09 +0100}
+}
+
+@Standard{	  2002,
+  title		= {{ISO}/{IEC}: {I}nformation {T}echnology-{Z} {F}ormal
+		  {S}pecification {N}otation-{S}yntax, {T}ype {S}ystem and
+		  {S}emantics.},
+  organization	= {International Standard},
+  number	= {13568},
+  url		= {http://standards.iso.org/ittf/PubliclyAvailableStandards/c021573_ISO_IEC_13568_2002(E).zip}
+		  ,
+  year		= {2002},
+  owner		= {randall},
+  timestamp	= {2013.06.11}
+}
+
+@Manual{	  fdr2manual2012,
+  title		= {{FDR}2 {U}ser {M}anual},
+  edition	= {FDR 2.94},
+  month		= {May},
+  organization	= {Formal Systems (Europe) Ltd},
+  year		= {2012},
+  file		= {:/Users/ykf_2001/GoogleDrive/References/CSP/fdr2manual-2.94.pdf:PDF}
+		  ,
+  owner		= {ykf_2001},
+  timestamp	= {2014.10.30}
+}
+
+@Electronic{	  fdr2,
+  title		= {{FDR}2: a refinement checker for establishing properties
+		  of models expressed in {CSP}},
+  url		= {www.fsel.com/software.html},
+  owner		= {ykf_2001},
+  timestamp	= {2013.05.28}
+}
+
+@Electronic{	  prob2,
+  title		= {{T}he {P}ro{B} {A}nimator and {M}odel {C}hecker},
+  url		= {http://www.stups.uni-duesseldorf.de/ProB/index.php5/Main_Page}
+		  ,
+  owner		= {randall},
+  timestamp	= {2013.05.08}
+}
+
+@Electronic{	  sicproman,
+  title		= {{SICS}tus {P}rolog {M}anual ({A}rithmetic {E}xpressions)},
+  url		= {https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/ref_002dari_002daex.html#ref_002dari_002daex}
+		  ,
+  owner		= {ykf_2001},
+  timestamp	= {2015.01.31}
+}

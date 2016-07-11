@@ -1,0 +1,35 @@
+\documentclass{article}
+%
+\usepackage{circus}
+%
+\begin{document}
+
+\begin{zsection}
+	\SECTION\ Achrono \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	RANGE == 0 .. 59
+\end{zed}
+
+\begin{circus}
+	\circchannel\ tick, time \\
+	\circchannel\ out : RANGE \cross RANGE
+\end{circus}
+
+\begin{circus}
+	\circprocess\ Achronometer \circdef \circbegin \\
+    	\t1 \circstate\ AState == [~ sec, minute : RANGE | true ~] \\
+    	\t1	Init == [~ (AState)' | sec' = 0 \land minute' = 0 ~] \\
+		\t1 IncSec == [~ \Delta AState | sec' = (sec + 1) \mod 60 \land minute' = minute ~] \\
+		\t1 IncMin == [~ \Delta AState | minute' = (minute + 1) \mod 60 \land sec' = sec ~] \\
+		\t1 Run \circdef (tick \then IncSec \circseq (
+        	( \lcircguard (sec = 0) \rcircguard \circguard IncMin) 
+ 	       	\extchoice 
+       		( \lcircguard (sec \neq 0) \rcircguard \circguard \Skip))) \\
+%	\extchoice (time \then out!(minute, sec) \then \Skip) \\
+	\t1 \circspot Init \circseq (\circmu X \circspot (Run \circseq X)) \\
+	\circend
+\end{circus}
+
+\end{document}

@@ -1,0 +1,13 @@
+\begin{zsection}
+  \SECTION\ indexed\_process\_1 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{circus}
+    \circchannel\ c
+\end{circus}
+
+\begin{circus}
+    \circprocess\ IP \circdef  v: \{1,2\} \circindex \circbegin  \\
+        \t1 \circspot c \then \Skip \\
+    \circend
+\end{circus}

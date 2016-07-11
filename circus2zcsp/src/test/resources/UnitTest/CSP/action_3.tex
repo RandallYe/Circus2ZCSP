@@ -1,0 +1,32 @@
+% variable block + prefix + external choice
+\begin{zsection}
+  \SECTION\ action\_3 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+    T == \{0, 1, 2\} \\
+	Tx == 0 .. 3 \\ 
+	Ty == 4 .. 6 \\ 
+	Tz == 7 .. 9 \\ 
+\end{zed}
+
+\begin{circus}
+	\circchannel\ in: Tx \cross Ty \cross Tz \\
+	\circchannel\ out: Tx \cross Ty \cross Tz \\
+	\circchannel\ c: Tx \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 S1 ~~==~~ [~  x: Tx; y: Ty | x \geq 1 \land y \neq 5 ~] \\
+        \t1 \circstate\ State ~~==~~ [~ S1; z: Tz | z > 7 ~] \\
+        \t1 Init ~~==~~ [~ (State)' | x' = 1 \land y' = 4 \land z' = 8 ~] \\
+        \t1 Update ~~==~~ [~ \Delta State; x?:Tx; y?:Ty; u!:Tx; z?: Tz; v!:Ty; w!:Tz | x' = x? \land y' = y? \land z' = z? \land u! = x \land v! = y \land w! = z ~] \\
+        \t1 Output \circdef \circvar l:T \circspot (out!(x-l)!(y+l)!(z*l) \then \Skip) \circhide \lchanset out \rchanset \\
+        \t1 Input \circdef \circvar u:Tx; v:Ty; w:Tz \circspot in?x?y?z \then \lschexpract Update \rschexpract \circseq out!(u \div w+1)!(v-u+1)!(w*v) \then \Skip \\
+        \t1 Action1 \circdef \circvar l1:Tx; l2:Ty; l3:Tz \circspot out!l1!l2!l3 \then \Skip \extchoice in?l1!l2?l3 \then \Skip \\
+        \t1 Action2 \circdef \circvar l:Tx \circspot \lcircguard x > 0 \land l = 2 \rcircguard \circguard c!l \then \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Output \extchoice Input \extchoice Action1 \extchoice Action2) \circseq X) \\ 
+	\circend
+\end{circus}
+

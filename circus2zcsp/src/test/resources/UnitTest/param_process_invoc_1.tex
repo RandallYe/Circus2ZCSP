@@ -1,0 +1,17 @@
+
+\begin{zsection}
+  \SECTION\ param\_process\_invoc\_1 \parents\ circus\_toolkit
+\end{zsection}
+
+% the type of parameter v can not be a basic type like \num, \nat etc since it can not be enumerated
+\begin{circus}
+    \circprocess\ PP \circdef  v: \{1, 2, 3\}; w: \{1,2\} \circspot \circbegin  \\
+    	\t1 \circstate\ State == [~ x:\nat | true ~] \\
+    	\t1	Init == [~ (State)' | x' = v \lor x' = w~] \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq \Skip \\
+    \circend
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P1 \circdef PP(1,2) \interleave PP(3,1) \\
+\end{circus}

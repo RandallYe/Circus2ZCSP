@@ -1,0 +1,78 @@
+\begin{zsection}
+  \SECTION\ omega\_2\_0 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+	TT == 0 .. 9 \\
+\end{zed}
+
+\begin{zed}
+    F ::= TF \ldata T \rdata
+    % fail to construct a mutually recursive free type
+%    F1 ::= TF1 \ldata F2 \rdata
+%    \&
+%    F2 ::= TF2 \ldata F1 \rdata
+\end{zed}
+
+\begin{axdef}
+    square: T \fun TT 
+\where
+    \forall n:T @ square(n) = n*n
+\end{axdef}
+
+\begin{axdef}
+    va: T 
+\end{axdef}
+
+\begin{circus}
+	\circchannel\ read, write: T \\
+	\circchannel\ in, out: T \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+\end{circus}
+
+\begin{circusaction}
+        \t1 \circstate\ State == [~ v: \nat | true ~] \\
+\end{circusaction}
+
+\begin{circusaction}
+        \t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        \t1 Init2 ~~==~~ [~ State~' | v' = 0 ~] \\
+        \t1 Init3 ~~==~~ [~ State\ ' | v' = 0 ~] \\
+\end{circusaction}
+
+\begin{schema}{CellWrite}
+    \Delta State; x?: \nat 
+    \where
+    v' = x? 
+\end{schema}
+
+\begin{circusaction}
+    % singleton schema set
+    \t1 Temp ~~==~~ [~ \Delta State; x?:\{CellWrite\} | v' = 0 ~] \\
+    \t1 InfixN ~~==~~ [~ \Xi State | \langle 1, 2, 3 \rangle \infix \langle 1, 2 \rangle ~] \\
+    \t1 InfixY ~~==~~ [~ \Xi State | \langle 1, 2 \rangle \infix \langle 0, 1, 2, 3 \rangle ~] \\
+    \t1 Symdiff ~~==~~ [~ \Delta State | v' \in \{1,2\} \symdiff \{2, 3\} ~] \\
+%    \t1 Symdiff1 ~~==~~ [~ \Delta State | v' \in (\{1,2\} \setminus \{2, 3\}) \cup (\{2, 3\} \setminus \{1, 2\}) ~] \\
+    \t1 LocalDef ~~==~~ [~ \Delta State | v' \in \LET x == (v+1) @ \{(x - 1), x\} ~] \\
+    \t1 Lambda ~~==~~ [~ \Delta State | v' = (\lambda x : T @ (x + x))(1) ~] \\
+    \t1 Mu ~~==~~ [~ \Delta State | v' = \mu x : T | x > 2 @ (x+x) ~] \\
+\end{circusaction}
+
+\begin{circusaction}
+        %\t1 CellWrite ~~==~~ [~ \Delta State; x?: \nat | v' = x? ~] \\
+        % schema as reference 
+        \t1 Read \circdef read!v \then \Skip \circseq \circvar l:\{CellWrite\} \circspot \Skip\\
+        \t1 Write \circdef write?x \then \lschexpract CellWrite \rschexpract \\
+\end{circusaction}
+
+\begin{circusaction}
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+\end{circusaction}
+
+\begin{circus}
+	\circend
+\end{circus}

@@ -1,0 +1,41 @@
+% set 
+
+\begin{zsection}
+  \SECTION\ exp\_2 \parents\ circus\_toolkit
+\end{zsection}
+
+\begin{zed}
+	T == 0 .. 3 \\
+	T1 == 0 \upto 3 \\
+    T2 == \{0, 1, 2, 3\} \\
+    T3 == \{x:T | x > 1 @ (x*x)\} \\
+    T4 == \{x:T | x > 1 \} \\
+    T5 == \{x:T @ (x*x) \} \\
+    T6 == T1 \cup T2 \cap T3 \\
+    T7 == T1 \setminus T2 \\
+    T8 == T1 \symdiff T2 \\
+    T9 == \bigcup \{T, T1\} \\
+    T10 == \bigcap \{T, T1\} \\
+    T11 == \finset T \\
+    T12 == \finset_1 T \\
+    [NAME] \\
+\end{zed}
+
+\begin{circus}
+	\circchannel\ c1: T5 \\
+	\circchannel\ c2: T \cross T5 \\
+	\circchannel\ c3: T \cross T1 \cross T2 \\
+	\circchannel\ c4: \power~T \\
+	\circchannel\ c5: \power_1~T \\
+\end{circus}
+
+\begin{circus}
+    \circprocess\ P \circdef \circbegin \\
+        \t1 \circstate\ State == [~ v: T | true ~] \\
+        \t1 Init ~~==~~ [~ (State)' | v' = 0 ~] \\
+        \t1 Read \circdef \circvar x:T \circspot \lcircguard (x \in T) \land (x \notin T) \land (\{x\} \neq \emptyset) \land (T1 \subseteq T2) \land (T1 \subset T2) \rcircguard \circguard c1.x \then \Skip \\
+        \t1 Write \circdef \circvar x:T \circspot \lcircguard (\#~T = 4) \rcircguard \circguard c1.x \then \Skip \\
+        \t1 \circspot \lschexpract Init \rschexpract \circseq (\circmu X \circspot (Read \extchoice Write) \circseq X) \\ 
+	\circend
+\end{circus}
+
