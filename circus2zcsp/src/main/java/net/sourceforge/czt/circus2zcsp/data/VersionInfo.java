@@ -17,10 +17,14 @@ public class VersionInfo
   
   final static private String VERSION_0_3 = "0.3";
   
+  final static private String VERSION_0_4 = "0.4";
+  
+  final static private String VERSION_0_5 = "0.5";
+  
   /**
    * Current version
    */
-  final static public String CUR_VERSION = VERSION_0_3;
+  final static public String CUR_VERSION = VERSION_0_5;
 
   final static private int MAX_WIDTH = 80;
 
@@ -35,6 +39,50 @@ public class VersionInfo
     private static final long serialVersionUID = 10L;
 
     {
+      put(VERSION_0_5, "This is the fifth release built on July 20th, 2016. "
+          + "It is capable of translating all constructs in the reactive buffer, "
+          + "the steam boiler cases, and the ESEL case.\n"
+          + "-------------------------------------- New ------------------------------------\n"
+          + "1. Add translator version and date information in the header of output CSP and Z."
+          + "------------------------------------- Fixed -----------------------------------\n"
+          + "------------------------------------ Changed ----------------------------------\n"
+          + "----------------------------------- Limitations -------------------------------\n"
+          + "1. External choice of actions are only available to \"prefixed\" actions "
+          + "(such as basic actions, prefixing, guarded commands), and compound CSP actions"
+          + " of these \"prefixed\" actions. \n"
+          + "2. Parallel composition and interleaving for actions are not supported if "
+          + "both actions share variables in scope.\n"
+          + "3. Operator template is not supported.\n" //  due to lack of support of generic definition in ProB
+          + "4. Reflexive-transitive closure (*) is not supported.\n"
+          + "5. For schemas as predicate, it may have duplicate predicates from the declaration"
+          + "part. It will not cause problems but make the model larger if there are many schema"
+          + " references in the schema.\n"
+          );
+      
+      put(VERSION_0_4, "This is the fourth release built on July 13th, 2016. "
+          + "It is capable of translating all constructs in the reactive buffer, "
+          + "the steam boiler cases, and the ESEL case.\n"
+          + "-------------------------------------- New ------------------------------------\n"
+          + "------------------------------------- Fixed -----------------------------------\n"
+          + "1. PredicateListExpansionVisitor: include predicates from the declaration part "
+          + "into the final predicate.\n"
+          + "------------------------------------ Changed ----------------------------------\n"
+          + "1. Move rewrite of schema as predicate (CircusSchemasAsPredicateVisitor) after  "
+          + "Stage 1 Rewrite then we don't have to cope with generic constructs since they "
+          + "have been rewritten in th Stage 1.\n"
+          + "----------------------------------- Limitations -------------------------------\n"
+          + "1. External choice of actions are only available to \"prefixed\" actions "
+          + "(such as basic actions, prefixing, guarded commands), and compound CSP actions"
+          + " of these \"prefixed\" actions. \n"
+          + "2. Parallel composition and interleaving for actions are not supported if "
+          + "both actions share variables in scope.\n"
+          + "3. Operator template is not supported.\n" //  due to lack of support of generic definition in ProB
+          + "4. Reflexive-transitive closure (*) is not supported.\n"
+          + "5. For schemas as predicate, it may have duplicate predicates from the declaration"
+          + "part. It will not cause problems but make the model larger if there are many schema"
+          + " references in the schema.\n"
+          );
+      
       put(VERSION_0_3, "This is the third release built on June 30th, 2016. "
           + "It is capable of translating all constructs in the reactive buffer, "
           + "the steam boiler cases, and the ESEL case.\n"

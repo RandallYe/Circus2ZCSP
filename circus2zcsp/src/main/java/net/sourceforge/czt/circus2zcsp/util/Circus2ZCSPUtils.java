@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,9 +50,9 @@ import net.sourceforge.czt.circus2zcsp.data.CircusSpecMap;
 import net.sourceforge.czt.circus2zcsp.data.FormatPattern;
 import net.sourceforge.czt.circus2zcsp.data.Node;
 import net.sourceforge.czt.circus2zcsp.data.PredExpPattern;
+import net.sourceforge.czt.circus2zcsp.data.VersionInfo;
 import net.sourceforge.czt.circus2zcsp.visitor.DeclListExpansionVisitor;
 import net.sourceforge.czt.circus2zcsp.visitor.Omega2Visitor;
-import net.sourceforge.czt.circus2zcsp.visitor.PrecChannelDeclVisitor;
 import net.sourceforge.czt.parser.util.Pair;
 import net.sourceforge.czt.print.util.PrintException;
 import net.sourceforge.czt.print.z.PrintUtils;
@@ -875,101 +876,101 @@ public class Circus2ZCSPUtils
     return str;
   }
 
-  /**
-   * Convert a schema into negation of its precondition, for schema as action rule
-   * 
-   * @param proname - the name of process
-   * @param axpara - the original schema
-   * @param cspspec - CSP Spec
-   * @param map - map data
-   */
-  @SuppressWarnings("unchecked")
-  public static AxPara NegPreconditionSchema(String proname, AxPara axpara,
-      CSPSpec cspspec, CircusSpecMap map)
-  {
-    assert(cspspec != null && map != null);
-    
-    ZFactory zfac_ = new net.sourceforge.czt.z.impl.ZFactoryImpl();
-
-    /*
-     * Channel definition
-     * channel fRead:Tins
-     */
-    Object ob = axpara.accept(new PrecChannelDeclVisitor());
-    if (ob instanceof List<?>) {
-      Debug.debug_print(
-          Thread.currentThread().getStackTrace()[1].getFileName() + ":" +
-          Thread.currentThread().getStackTrace()[1].getMethodName() + ":" +
-          Thread.currentThread().getStackTrace()[1].getLineNumber() + "  " + 
-          "channel:" + (List<String>) ob);
-      cspspec.addChannel((List<String>) ob);
-    }
-
-    // original schema name
-    Name pName = ZUtils.getAxParaSchOrAbbrName((Term)axpara);
-    String paraName = Circus2ZCSPUtils.termToString(pName);
-
-    ZNameList fp = zfac_.createZNameList();
-    // ZName for new schema
-    ZName paraname = zfac_.createZName(
-        MessageFormat.format(FormatPattern.NEG_PRECONDITION_SCHEMA, paraName),
-        zfac_.createZStrokeList(), null);
-
-    cspspec.addHideCSPB(MessageFormat.format(FormatPattern.NEG_PRECONDITION_SCHEMA, paraName));
-    ZDeclList declList = zfac_.createZDeclList();
-
-    // State Paragraph Name and \Xi State Paragraph. It's an InclDecl
-    String stName = map.getStatPara(proname);
-    ZName stname = zfac_.createZName(ZString.XI + stName, zfac_.createZStrokeList(), null);
-    RefExpr expr = zfac_.createRefExpr(stname, zfac_.createZExprList(), false, false);
-
-    InclDecl inclDecl = zfac_.createInclDecl(expr);
-    declList.add(inclDecl);
-
-    // Add other inputs declarations
-    for (Decl decl : axpara.getZSchText().getZDeclList()) {
-      if (decl instanceof ConstDecl) {
-        Expr expr1 = ((ConstDecl) decl).getExpr();
-        if (expr1 instanceof SchExpr) {
-          for (Decl decl1 : ((SchExpr) expr1).getZSchText().getZDeclList()) {
-            if (decl1 instanceof VarDecl) {
-              for (Name zn : ((VarDecl) decl1).getZNameList()) {
-                if (zn instanceof ZName) {
-                  for (net.sourceforge.czt.z.ast.Stroke sk : ((ZName) zn).getZStrokeList()) {
-                    if (sk instanceof InStroke) {
-                      declList.add(decl1);
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    //
-    ZName axparaname = zfac_.createZName(paraName, zfac_.createZStrokeList(), null);
-    // RefExpr to schema
-    RefExpr refexpr = zfac_.createRefExpr(axparaname, zfac_.createZExprList(), false, false);
-    // Precondition expression
-    PreExpr preexpr = zfac_.createPreExpr(refexpr);
-    // Negation expression
-    NegExpr negexpr = zfac_.createNegExpr(preexpr);
-    //
-    ExprPred exprpred = zfac_.createExprPred(negexpr);
-    ZSchText schText = zfac_.createZSchText(declList, exprpred);
-    SchExpr schExpr = zfac_.createSchExpr(schText);
-
-    ConstDecl cd = zfac_.createConstDecl(paraname, schExpr);
-
-    ZDeclList declList0 = zfac_.createZDeclList();
-    declList0.add(cd);
-    SchText st = zfac_.createZSchText(declList0, null);
-
-    AxPara faxpara = zfac_.createAxPara(fp, st, Box.OmitBox);
-    return faxpara;
-  }
+//  /**
+//   * Convert a schema into negation of its precondition, for schema as action rule
+//   * 
+//   * @param proname - the name of process
+//   * @param axpara - the original schema
+//   * @param cspspec - CSP Spec
+//   * @param map - map data
+//   */
+//  @SuppressWarnings("unchecked")
+//  public static AxPara NegPreconditionSchema(String proname, AxPara axpara,
+//      CSPSpec cspspec, CircusSpecMap map)
+//  {
+//    assert(cspspec != null && map != null);
+//    
+//    ZFactory zfac_ = new net.sourceforge.czt.z.impl.ZFactoryImpl();
+//
+//    /*
+//     * Channel definition
+//     * channel fRead:Tins
+//     */
+//    Object ob = axpara.accept(new PrecChannelDeclVisitor());
+//    if (ob instanceof List<?>) {
+//      Debug.debug_print(
+//          Thread.currentThread().getStackTrace()[1].getFileName() + ":" +
+//          Thread.currentThread().getStackTrace()[1].getMethodName() + ":" +
+//          Thread.currentThread().getStackTrace()[1].getLineNumber() + "  " + 
+//          "channel:" + (List<String>) ob);
+//      cspspec.addChannel((List<String>) ob);
+//    }
+//
+//    // original schema name
+//    Name pName = ZUtils.getAxParaSchOrAbbrName((Term)axpara);
+//    String paraName = Circus2ZCSPUtils.termToString(pName);
+//
+//    ZNameList fp = zfac_.createZNameList();
+//    // ZName for new schema
+//    ZName paraname = zfac_.createZName(
+//        MessageFormat.format(FormatPattern.NEG_PRECONDITION_SCHEMA, paraName),
+//        zfac_.createZStrokeList(), null);
+//
+//    cspspec.addHideCSPB(MessageFormat.format(FormatPattern.NEG_PRECONDITION_SCHEMA, paraName));
+//    ZDeclList declList = zfac_.createZDeclList();
+//
+//    // State Paragraph Name and \Xi State Paragraph. It's an InclDecl
+//    String stName = map.getStatPara(proname);
+//    ZName stname = zfac_.createZName(ZString.XI + stName, zfac_.createZStrokeList(), null);
+//    RefExpr expr = zfac_.createRefExpr(stname, zfac_.createZExprList(), false, false);
+//
+//    InclDecl inclDecl = zfac_.createInclDecl(expr);
+//    declList.add(inclDecl);
+//
+//    // Add other inputs declarations
+//    for (Decl decl : axpara.getZSchText().getZDeclList()) {
+//      if (decl instanceof ConstDecl) {
+//        Expr expr1 = ((ConstDecl) decl).getExpr();
+//        if (expr1 instanceof SchExpr) {
+//          for (Decl decl1 : ((SchExpr) expr1).getZSchText().getZDeclList()) {
+//            if (decl1 instanceof VarDecl) {
+//              for (Name zn : ((VarDecl) decl1).getZNameList()) {
+//                if (zn instanceof ZName) {
+//                  for (net.sourceforge.czt.z.ast.Stroke sk : ((ZName) zn).getZStrokeList()) {
+//                    if (sk instanceof InStroke) {
+//                      declList.add(decl1);
+//                    }
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+//
+//    //
+//    ZName axparaname = zfac_.createZName(paraName, zfac_.createZStrokeList(), null);
+//    // RefExpr to schema
+//    RefExpr refexpr = zfac_.createRefExpr(axparaname, zfac_.createZExprList(), false, false);
+//    // Precondition expression
+//    PreExpr preexpr = zfac_.createPreExpr(refexpr);
+//    // Negation expression
+//    NegExpr negexpr = zfac_.createNegExpr(preexpr);
+//    //
+//    ExprPred exprpred = zfac_.createExprPred(negexpr);
+//    ZSchText schText = zfac_.createZSchText(declList, exprpred);
+//    SchExpr schExpr = zfac_.createSchExpr(schText);
+//
+//    ConstDecl cd = zfac_.createConstDecl(paraname, schExpr);
+//
+//    ZDeclList declList0 = zfac_.createZDeclList();
+//    declList0.add(cd);
+//    SchText st = zfac_.createZSchText(declList0, null);
+//
+//    AxPara faxpara = zfac_.createAxPara(fp, st, Box.OmitBox);
+//    return faxpara;
+//  }
   
   /**
    * Convert a schema into negation of its precondition, for schema as action rule
@@ -1472,6 +1473,13 @@ public class Circus2ZCSPUtils
     StringBuilder sbISO = new StringBuilder();
     StringBuilder sbZRM = new StringBuilder();
     
+    String zheader = "% This file is automatically generated by the Circus2ZCSP Translator V" + VersionInfo.CUR_VERSION
+            + "\n% on " + Calendar.getInstance().getTime() + "\n"
+            + "% See https://github.com/RandallYe/Circus2ZCSP for more information.\n\n";
+    String cspheader = "-- This file is automatically generated by the Circus2ZCSP Translator V" + VersionInfo.CUR_VERSION
+            + "\n-- on " + Calendar.getInstance().getTime() + "\n"
+            + "-- See https://github.com/RandallYe/Circus2ZCSP for more information.\n\n";
+
     for(Sect sect: spec.getSect()) {
       if (sect instanceof ZSect) {
         sectionName = ((ZSect) sect).getName();
@@ -1534,7 +1542,7 @@ public class Circus2ZCSPUtils
           // isoz spec
           zstream = new FileOutputStream(zfilename + ".iso");
           Writer zwriter = new OutputStreamWriter(zstream);
-          zwriter.write(isoz);
+          zwriter.write(zheader + isoz);
           zwriter.close();
         }
         catch (FileNotFoundException e) {
@@ -1589,13 +1597,13 @@ public class Circus2ZCSPUtils
       // z spec
       zstream = new FileOutputStream(zfilename);
       Writer zwriter = new OutputStreamWriter(zstream);
-      zwriter.write(sbZRM.toString());
+      zwriter.write(zheader + sbZRM.toString());
       zwriter.close();
       
       if(cspspec != null) {
         cspstream = new FileOutputStream(cspfilename);
         Writer cspwriter = new OutputStreamWriter(cspstream);
-        cspwriter.write(cspspec.toString());
+        cspwriter.write(cspheader + cspspec.toString());
         cspwriter.close();
       }
     }

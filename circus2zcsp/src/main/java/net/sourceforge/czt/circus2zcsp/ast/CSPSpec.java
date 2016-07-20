@@ -76,8 +76,8 @@ public class CSPSpec
     /*
      * Add header of CSP Program
      */
-    header_.add("-- This CSP specification is translated from a Circus program by Circus2ZCSP translator.");
-    header_.add("");
+//    header_.add("-- This CSP specification is translated from a Circus program by Circus2ZCSP translator.");
+//    header_.add("");
     header_.add("-- Minimum and maximum integers for model checking. Make sure they are set in advance.");
     header_.add("MININT = " + minInt);
     header_.add("MAXINT = " + maxInt);
